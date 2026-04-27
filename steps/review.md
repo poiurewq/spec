@@ -35,10 +35,12 @@ Read state.yaml first; validate phase. Write state.yaml on completion.
 
 4. **Verify each critique exists.** For each of the three expected critique files, check whether it was written. For any file that is missing, extract the dumped content from that sub-agent's reply and write it directly using the Write tool in the parent session.
 
-5. **Summarize.** After all three critiques exist on disk, read each critique file. Present terse combined summary:
-   - Top 2–3 concerns per persona.
-   - **Overlapping concerns** grouped together (higher weight).
-   - **Conflicting concerns** flagged as tensions requiring user judgment.
+5. **Confirm and headline.** After all three critiques exist on disk, report a one-line headline per persona (no cross-cutting analysis — `/spec revise` produces the structured breakdown from the same files):
+
+   > Three critiques written (`<PREFIX>-{ontologist,contrarian,simplifier}.md`).
+   > - **Ontologist:** <one line>
+   > - **Contrarian:** <one line>
+   > - **Simplifier:** <one line>
 
 6. **Update state.yaml:** `phase: in-review`, `latest_review_stamp: <PREFIX>`, `last_command: /spec review`, `last_command_at: <timestamp>`.
 
@@ -51,4 +53,4 @@ Read state.yaml first; validate phase. Write state.yaml on completion.
 
    Substitute the concrete `<PREFIX>` from step 2 and `<N>` from state.yaml.
 
-8. **Next step.** Tell the user to run `/spec revise` in a new conversation after committing (or without committing, if they prefer to batch).
+8. **Next step.** Tell the user to commit (or skip and batch later), then run `/spec revise` — it will read the critique files and produce the structured per-concern breakdown to drive the revision dialogue.
