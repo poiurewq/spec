@@ -29,21 +29,69 @@ Read `state.yaml` first; validate phase. Write `state.yaml` only when the user c
 
    When ambiguous, ask the user: "Have you implemented phase `<N>` already, or are we starting it?"
 
-5. **Kickoff stage.** Show the user:
-   - The phase heading, `Delivers:` line, and dependency clause from `spec.md`.
-   - The full list of leaf ACs in this phase (with their text from the AC tree, not just IDs).
-   - Any `[adopted]`-tagged ACs and `## Invariants` / `## Provisional invariants` items as constraints to preserve.
-   - A copy-pasteable kickoff prompt for a fresh conversation:
+5. **Kickoff stage.** The kickoff prompt is **generated**, not templated — the orchestrator extracts the exact context this phase needs and embeds it inline so the fresh worker session does minimal exploration before writing code.
 
-     ```
-     Read spec/spec.md. Implement phase <N> ("<phase name>") only — the ACs listed under that phase
-     in the ## Implementation phases section. Treat ACs from later phases as out-of-scope for now.
-     Treat [adopted] ACs, ## Invariants, and ## Provisional invariants as constraints to preserve —
-     do not regress them. Items under ## Test-pending are deferred; do not pick them up.
-     When done, ask me to run `/spec implement` again to audit the work.
-     ```
+   **5a. Extract context from `spec/spec.md`** (record line ranges as you go — the prompt will cite them):
 
-   - Tell the user: "Open a fresh conversation in this repo, paste the prompt above, implement phase `<N>`, then return here and re-run `/spec implement`. Do not commit between sessions if you'd like the audit to detect your changes — the per-phase verify uses git state to scope evidence." Stop.
+   - **Phase block:** the `### Phase <N>` heading, its `**Delivers:**` line, and its `**Depends on:**` / `**Unblocks:**` clause. Capture the line range.
+   - **Phase ACs (verbatim):** for each leaf AC ID listed under this phase, find its full text in the `## Acceptance criteria` tree. Capture both the ID-and-text and the source line for each.
+   - **Adjacent phases:** the headings + Delivers lines of phase `<N-1>` (already done) and phase `<N+1>` (not yet started), if they exist. These bound the scope. Capture line ranges only — do not embed verbatim.
+   - **Constraints to preserve (verbatim):** all items under `## Invariants`, `## Provisional invariants`, and any `[adopted]`-tagged ACs in the AC tree. Capture verbatim *and* line ranges.
+   - **Deferred items:** the line range of `## Test-pending`, if present. Do not embed — just point.
+   - **Mode-specific context** from `state.yaml`:
+     - `mode: adopted` → note that `[adopted]` ACs are unverified claims about pre-existing behavior; if the worker finds them already satisfied, minimal-touch is correct.
+     - `mode: iteration` → if `spec/takeaway.md` exists, capture the path; the worker may consult it for prior-iteration context.
+     - `mode: greenfield` → no extra context.
+
+   **5b. Determine phase-position narrative:**
+
+   - **Foundation** (no `**Depends on:**` clause, or `**Unblocks:** foundation`): "This is the bedrock; no prior phase output to integrate with."
+   - **Dependent** (`**Depends on:** Phase X (...)`): "Phase `<X>` is already implemented and committed (SHA `<short-SHA>` from `git log -1 --format=%h <state-commit>`). Build on what it delivers; do not re-implement it."
+   - **Final phase** (no later phase exists): "This phase completes the iteration's implementation work; `/spec verify` runs next."
+
+   **5c. Show the user** the extracted summary (phase heading, Delivers, deps, AC list with text, constraints) — same as before, so the user can sanity-check before pasting.
+
+   **5d. Compose the kickoff prompt** with this structure (fill in from extractions; omit sections that are empty):
+
+   ```
+   Implement phase <N> of spec/spec.md ("<phase short name>"). Do not implement other phases.
+
+   ## What this phase delivers
+   <verbatim Delivers: line>
+   <phase-position narrative from 5b — one or two sentences>
+
+   ## ACs to satisfy (this phase only)
+   <For each leaf AC, on its own line:>
+   - <AC-ID>: <verbatim AC text>   (spec.md:<line>)
+
+   ## Constraints — do not regress these
+   <If Invariants present:>
+   Invariants (spec.md:<start>-<end>):
+   - <verbatim invariant 1>
+   - <verbatim invariant 2>
+   <If Provisional invariants present, same shape.>
+   <If [adopted] ACs present:>
+   [adopted] ACs — claims about existing behavior to preserve (spec.md:<start>-<end>):
+   - <AC-ID>: <verbatim text>
+
+   ## Out of scope
+   - Phase <N+1>+ ACs (spec.md:<line-range-of-later-phases>) — do not pre-build.
+   - Items under ## Test-pending (spec.md:<line>) — deferred; ignore.
+   <If mode == adopted:>
+   - [adopted] ACs not in this phase's scope are verification targets for /spec verify, not implementation work for you.
+
+   ## Reference
+   - Full phase block: spec.md:<phase-line-range>
+   - Full AC tree: spec.md:<AC-section-line-range>
+   <If mode == iteration and takeaway.md exists:>
+   - Prior iteration takeaway: spec/takeaway.md  (consult only if you need historical context)
+
+   When done, do not commit. Tell the user the implementation is ready for audit; they will re-run `/spec implement` from the orchestrating session, which uses uncommitted git state to scope the audit.
+   ```
+
+   Render this prompt inside a single fenced code block so the user can copy it cleanly.
+
+   **5e. Tell the user:** "Open a fresh conversation in this repo, paste the prompt above, implement phase `<N>`, then return here and re-run `/spec implement`. Do not commit between sessions — the per-phase audit uses uncommitted working-tree state to scope evidence." Stop.
 
 6. **Audit stage.** Determine filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-implement-phase<N>.md`. Spawn an `Explore` sub-agent with `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**:
 
