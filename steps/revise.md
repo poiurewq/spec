@@ -53,4 +53,6 @@ Only after the user signals done:
    git commit -m "spec: revise per review <YYYY-MM-DD>"
    ```
 
-6. **Next step.** Tell the user to run `/spec check` in a new conversation.
+6. **Next step.** Tell the user they can either:
+   - Run `/spec review` (another review pass — if the revision was significant and they want fresh critique before moving on), or
+   - Run `/spec check` (to verify the spec is ready to implement).
