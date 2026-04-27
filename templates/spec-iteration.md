@@ -82,13 +82,13 @@
 
 ### Phase 1. <short name>
 **Delivers:** <what works at the end of this phase, in one line>
-**Unblocks:** <what later phases need from this — or "foundation" if it's the bedrock of the delta>
+**Unblocks:** Phase N (<short purpose phrase, e.g., "submission-readiness assembly">) — or "foundation" if it's the bedrock of the delta and unblocks everything downstream.
 - AC1.1
 - AC1.2
 
 ### Phase 2. <short name>
 **Delivers:** <…>
-**Depends on:** Phase 1 (<which piece>)
+**Depends on:** Phase 1 (<short purpose phrase, e.g., "research-gate decisions">)
 - AC2.1   _(if AC2 is `[delta]`; skip `[regression]`/`[adopted]` ACs)_
 
 ## Open questions
