@@ -15,6 +15,8 @@ Record a significant decision to `spec/decisions.log`.
 
 ## Entry format
 
+**Always append — never insert.** Add the new entry at the end of the file. The file is strictly append-only; placing a new entry anywhere other than the end corrupts the chronological record and violates the cross-iteration audit trail.
+
 Append to `spec/decisions.log`. If first write ever, create with header:
 ```
 # Decision log
