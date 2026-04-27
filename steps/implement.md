@@ -86,6 +86,9 @@ Read `state.yaml` first; validate phase. Write `state.yaml` only when the user c
    <If mode == iteration and takeaway.md exists:>
    - Prior iteration takeaway: spec/takeaway.md  (consult only if you need historical context)
 
+   ## Design decisions — surface, don't decide
+   The ACs and constraints above pin down *what* must be true, not *how* to get there. Where the spec is silent or ambiguous on an implementation choice — data shape, API surface, library selection, error semantics, naming, file/module layout, migration vs. rewrite, sync vs. async, etc. — do not pick unilaterally. Stop, name the fork and the options you see (with the tradeoffs you'd weigh), and ask the user before writing code down that path. The working principle that "the user judges" should apply to design decisions during implementation. A small clarifying question now is cheaper than rework after audit.
+
    When done, do not commit. Tell the user the implementation is ready for audit; they will re-run `/spec implement` from the orchestrating session, which uses uncommitted git state to scope the audit.
    ```
 
