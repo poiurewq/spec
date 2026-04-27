@@ -1,6 +1,6 @@
 ---
 name: spec
-description: Guide the user through a deliberate, iterative specification-development workflow for software projects (greenfield, iteration, or adoption of an existing brownfield project). Activates on /spec and its subcommands (/spec interview, /spec adopt, /spec seed, /spec review, /spec revise, /spec check, /spec verify, /spec close, /spec decide, /spec help). Maintains artifacts under ./spec/ with an explicit state machine in ./spec/state.yaml.
+description: Guide the user through a deliberate, iterative specification-development workflow for software projects (greenfield, iteration, or adoption of an existing brownfield project). Activates on /spec and its subcommands (/spec interview, /spec adopt, /spec seed, /spec review, /spec revise, /spec check, /spec implement, /spec verify, /spec close, /spec decide, /spec help). Maintains artifacts under ./spec/ with an explicit state machine in ./spec/state.yaml.
 ---
 
 # /spec — Specification development skill
@@ -32,6 +32,7 @@ Human-driven, agent-assisted spec-development: Socratic interview gated by a sel
 | `/spec review` | Read `steps/review.md` |
 | `/spec revise` | Read `steps/revise.md` |
 | `/spec check` | Read `steps/check.md` |
+| `/spec implement` (optional `<phase-N>`) | Read `steps/implement.md` |
 | `/spec verify` | Read `steps/verify.md` |
 | `/spec close` | Read `steps/close.md` |
 | `/spec decide` or `/spec decide "<text>"` | Read `steps/decide.md` |
@@ -69,6 +70,7 @@ spec_sha: <git SHA | null>       # last commit touching spec/spec.md
 latest_interview: <archive filename | null>
 latest_review_stamp: <prefix | null>     # e.g., "v002-2026-04-22-1100"
 latest_verify: <archive filename | null>
+phases_implemented: [<int>]              # phase numbers user confirmed via /spec implement; default []. Cleared on /spec close (next iteration restarts).
 ```
 
 **Skill is the sole writer.** Accepted GAP rationales from `/spec close` live in `takeaway.md`, not here.
@@ -95,9 +97,9 @@ latest_verify: <archive filename | null>
 | `interviewing` | Continue `/spec interview` (resume) |
 | `seeded` | `/spec review` |
 | `in-review` | `/spec revise` |
-| `revised` | `/spec check` (or `/spec review` for another loop); once the spec is stable, **implement the `[delta]` ACs in a fresh session** (see README "Implementation is not a skill command") before `/spec verify`. |
-| `converged` | **Implement the `[delta]` ACs in a fresh session** (see README "Implementation is not a skill command"), then `/spec verify`. |
-| `verified` | `/spec close` |
+| `revised` | `/spec check` (or `/spec review` for another loop). |
+| `converged` | `/spec implement` to walk the `## Implementation phases` one phase at a time (each phase is implemented in a fresh session; the skill orchestrates kickoff and per-phase audit). When all phases are confirmed, run `/spec verify` for the full-spec audit. If the spec has no phases declared, implement freely in a fresh session and run `/spec verify` directly. |
+| `verified` | `/spec close` (or `/spec implement` to re-audit a phase, harmless). |
 | `closed` | `/spec interview` (start next iteration) |
 
 ## Mode

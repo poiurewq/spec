@@ -19,8 +19,9 @@ Most AI-assisted development fails at the input stage. `/spec` gives you a disci
 3. **Review** — three skeptical personas (Ontologist, Contrarian, Simplifier) critique in parallel.
 4. **Revise** — you address each critique in conversation; the agent proposes the revision.
 5. **Check** — declare convergence when two consecutive revisions changed only wording.
-6. **Verify** — after implementation: audit code against spec; get a per-AC evidence report.
-7. **Close** — resolve gaps, generate the takeaway, archive the iteration. Ready for iteration N+1.
+6. **Implement** — walk the spec's `## Implementation phases` one phase at a time. Each call kicks off a fresh implementation session, then audits that phase's ACs on re-run. Optional — skip if the spec has no phases or you prefer to implement freely and run `/spec verify` directly.
+7. **Verify** — full-spec audit: per-AC PASS / GAP / UNCLEAR evidence report.
+8. **Close** — resolve gaps, generate the takeaway, archive the iteration. Ready for iteration N+1.
 
 ### Subcommands
 
@@ -33,6 +34,7 @@ Most AI-assisted development fails at the input stage. `/spec` gives you a disci
 | `/spec review` | Three-persona review |
 | `/spec revise` | Incorporate critiques (three-turn) |
 | `/spec check` | Test convergence |
+| `/spec implement` (optional `<phase-N>`) | Per-phase orchestration: kickoff prompt + per-phase audit |
 | `/spec verify` | Audit code against spec |
 | `/spec close` | Finalize iteration, generate takeaway |
 | `/spec decide "<text>"` | Log a decision |
@@ -48,8 +50,8 @@ Each line is a **fresh conversation**.
 /spec review
 /spec revise
 /spec check                    # may loop back to /spec review if not converged
-# -- implement the spec in a separate coding session --
-/spec verify                   # re-run freely as implementation progresses
+/spec implement                # repeat per phase: kickoff prompt → fresh impl session → re-run for per-phase audit
+/spec verify                   # full-spec audit; re-run freely
 /spec close                    # resolves any remaining gaps, writes takeaway.md
 ```
 
@@ -78,7 +80,7 @@ Starts right after `/spec close` of a prior iteration:
 /spec review                   # personas apply their in-iteration addenda
 /spec revise
 /spec check
-# -- implement the delta --
+/spec implement                # walks the phased delta one phase at a time
 /spec verify
 /spec close                    # writes new takeaway.md; old one archived
 ```

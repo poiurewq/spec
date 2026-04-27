@@ -70,7 +70,7 @@ Once all GAPs/UNCLEARs are resolved or accepted:
    ---
    ```
 
-7. **Update state.yaml:** `phase: closed`, `last_command: /spec close`, `last_command_at`.
+7. **Update state.yaml:** `phase: closed`, `last_command: /spec close`, `last_command_at`. Reset `phases_implemented: []` so the next iteration starts with an empty per-phase audit trail.
 
 8. **Propose commit:**
    ```

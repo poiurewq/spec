@@ -42,6 +42,7 @@ spec/
 | `/spec review` | Three parallel Opus personas critique the spec |
 | `/spec revise` | Three-turn: summarize → user addresses → propose revision |
 | `/spec check` | Convergence test (two consecutive wording-only revisions) |
+| `/spec implement` | Orchestrates per-phase implementation: kickoff prompt for a fresh session, then per-phase Explore audit on re-run. Does **not** implement code itself |
 | `/spec verify` | Explore subagent audits code against spec, renders evidence |
 | `/spec close` | Finalize iteration: resolve gaps, generate takeaway, archive |
 | `/spec decide` | Log a decision (explicit or auto-triggered mid-step) |
@@ -71,7 +72,11 @@ Six phases per iteration, linear except for the review↔revise↔check loop:
                                               (not converged: stays revised)
                                               (converged)
                                                      ▼
-                                                converged
+                                                converged ◄──┐
+                                                     │       │ /spec implement (per-phase loop;
+                                                     │       │  appends to phases_implemented,
+                                                     │       │  does not change phase)
+                                                     │ ──────┘
                                                      │
                                                      │ /spec verify
                                                      ▼
@@ -96,6 +101,7 @@ Six phases per iteration, linear except for the review↔revise↔check loop:
 | `/spec review` | `seeded` · `revised` · `in-review` (re-run warn) | `in-review` |
 | `/spec revise` | `in-review` | `revised` |
 | `/spec check` | `revised` | `converged` or stays `revised` |
+| `/spec implement` | `converged` · `verified` (re-audit) | unchanged (appends to `phases_implemented` on user confirmation) |
 | `/spec verify` | `converged` · `verified` (re-run) | `verified` |
 | `/spec close` | `verified` | `closed` (**refused** if already `closed`) |
 | `/spec decide` | any | unchanged |
@@ -103,19 +109,25 @@ Six phases per iteration, linear except for the review↔revise↔check loop:
 
 Every step file includes a `## State machine` section at the top declaring these constraints and what it writes back to `state.yaml`.
 
-## Implementation is not a skill command
+## Implementation: orchestrated, not performed
 
-Notice the gap in the state diagram between `revised` / `converged` and `verified`: that's where you actually build the thing. There is deliberately no `/spec implement` command. The skill's value is concentrated in the ambiguity-rich steps — interviewing, reviewing, revising, verifying, closing — where a structured process beats ad-hoc conversation. Implementation is the opposite: the lowest-ambiguity step in the loop, because the spec's `## Change delta` + `[delta]`-tagged ACs already enumerate every deliverable. Wrapping it in skill ceremony would add overhead without adding judgment, and the skill's principle of "separate conversations for generative steps" argues for implementation being its own fresh session anyway.
+The skill does **not** implement code itself. Implementation happens in fresh conversations the user opens — the principle "separate conversations for generative steps" applies, and implementation is the lowest-ambiguity step in the loop (the spec's `[delta]`-tagged ACs already enumerate every deliverable). What the skill *does* provide, via `/spec implement`, is **orchestration**: walking through the spec's `## Implementation phases` one phase at a time, with a per-phase Explore audit between phases as an early-warning evidence layer before the final full-spec `/spec verify`.
 
-**Recipe for the implementation session:**
+**Recipe (with phases declared):**
 
-1. Commit the current `spec/` state. Open a fresh conversation in the same repo.
-2. Prompt the agent along these lines:
+1. Run `/spec implement` after `converged`. It identifies the next un-confirmed phase, shows you its ACs, and gives you a copy-pasteable kickoff prompt.
+2. Open a fresh conversation, paste the kickoff prompt, implement just that phase. The prompt restricts scope to the current phase's ACs and reminds the agent to preserve `[adopted]` claims, `## Invariants`, and `## Provisional invariants`.
+3. Return to the `/spec implement` session and re-run the command. It runs an Explore audit over only that phase's ACs (plus any plausibly-touched invariants), presents per-AC PASS/GAP/UNCLEAR evidence, and asks you to confirm.
+4. On confirm, the phase is appended to `phases_implemented` and the skill proposes a per-phase commit. Repeat for the next phase.
+5. When all phases are confirmed, run `/spec verify` for the full-spec audit, then `/spec close`.
+
+**Recipe (no phases declared, or single-phase iteration):**
+
+1. After `converged`, open a fresh conversation. Prompt:
    > Read `spec/spec.md`. Implement every `[delta]` AC. Treat `[adopted]` ACs, `## Invariants`, and `## Provisional invariants` as constraints to preserve — do not regress them. Items under `## Test-pending` are deferred to a future iteration; do not pick them up now.
-3. The agent works through the `[delta]` ACs; each one is independently testable by construction.
-4. When all deltas are done, open a new conversation and run `/spec verify` to collect evidence that both the `[delta]` deliverables landed and the `[adopted]`/invariant constraints still hold.
+2. When deltas are done, open a new conversation and run `/spec verify`.
 
-Why this works: the spec is already the implementation TODO list. AC numbers give commits a natural reference scheme, and `/spec verify` is the structured audit that catches any regression the implementation session introduced — so the rigor lives on the *verification* side rather than the *implementation* side. If you find yourself wanting more structure during implementation (e.g., invariant-preservation enforcement per-AC), that's a signal the spec is under-specified, not that the skill needs a new command.
+Why orchestration earns its keep even though implementation itself is low-ambiguity: phases are the natural commit boundary, "which phase is next" is genuinely state worth tracking, and per-phase audits catch regressions earlier and at smaller scope than waiting for a single end-of-iteration `/spec verify`. The rigor still lives on the verification side — the implementation step is a thin wrapper around "give the user the right prompt, then audit what they did."
 
 ## state.yaml schema
 
@@ -131,6 +143,7 @@ spec_sha: <git SHA | null>      # last commit touching spec/spec.md
 latest_interview: <filename | null>
 latest_review_stamp: <prefix | null>   # e.g., "v002-2026-04-22-1100"
 latest_verify: <filename | null>
+phases_implemented: [<int>]            # phase numbers user confirmed via /spec implement; default []. Reset to [] on /spec close.
 ```
 
 Notes:
