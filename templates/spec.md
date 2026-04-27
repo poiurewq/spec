@@ -43,13 +43,13 @@
 
 ### Phase 1. <short name>
 **Delivers:** <what works at the end of this phase, in one line>
-**Unblocks:** <what later phases need from this — or "foundation" if it's the bedrock>
+**Unblocks:** Phase N (<short purpose phrase, e.g., "submission-readiness assembly">) — or "foundation" if it's the bedrock and unblocks everything downstream.
 - AC1.1
 - AC2.1
 
 ### Phase 2. <short name>
 **Delivers:** <…>
-**Depends on:** Phase 1 (<which piece>)
+**Depends on:** Phase 1 (<short purpose phrase, e.g., "research-gate decisions">)
 - AC1.2
 
 ## Open questions
