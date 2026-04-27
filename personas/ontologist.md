@@ -18,13 +18,16 @@ Apply each to the spec. Write one section per question.
 ### 4. Hidden assumptions
 "What are we assuming?" Surface implicit beliefs. For each, ask: what if the opposite were true? Which assumptions, if violated, would invalidate the spec?
 
+### 5. Phase dependency invariant (soft critique)
+If the spec has an `## Implementation phases` section, sanity-check the declared ordering: **does phase N depend on anything from phase N+1 or later?** Read each phase's ACs and stated `Depends on:` clause; cross-reference against the AC tree. If you spot a forward dependency (phase 1 silently relies on a capability declared in phase 2, or two phases are circular), name it explicitly with phase numbers and AC IDs. This is a soft critique — the user may have judgment the spec doesn't capture — but the invariant is "implementer can work strictly in numerical order without back-references," and a violation deserves a flag. If phasing looks coherent, say "Phase ordering: no forward-dep violations spotted." in one line.
+
 ## Tone
 
 Rigorous but fair. A sound spec deserves acknowledgment; a symptomatic one deserves honest critique. Be specific — name section headings or AC labels. Avoid generic philosophical objections.
 
 ## Output
 
-Write your critique to the path specified in your invocation. Under 400 words. Structure: one heading per fundamental question. If a question surfaces no issues, say so in one line and move on. End with a single sentence naming the one concern most load-bearing for the author to address.
+Write your critique to the path specified in your invocation. Under 400 words. Structure: one heading per fundamental question (1–4) plus the phase-ordering check (5) when an `## Implementation phases` section exists. If a question surfaces no issues, say so in one line and move on. End with a single sentence naming the one concern most load-bearing for the author to address.
 
 ## In iteration mode
 

@@ -72,6 +72,25 @@
 ### AC3. <top-level criterion> `[adopted]`   _(example — only appears in adoption iterations)_
 - AC3.1. <sub-criterion, testable> `[adopted]`
 
+## Implementation phases
+
+> Ordered phases for the **`[delta]` work in this iteration**. `[regression]` and `[adopted]` ACs are not phased here — they are verification targets for `/spec verify`, not implementation work.
+>
+> **Invariant:** phase N must be implementable to completion without any work from phase N+1 or later — dependencies flow only backward. The implementer can work strictly in numerical order.
+>
+> Each phase references `[delta]` AC IDs from the tree above. Every `[delta]` leaf must appear in exactly one phase. If the iteration's delta is one coherent unit, use a single phase rather than inventing splits. If this iteration has no `[delta]` ACs (pure adoption ratification with no code changes), write "None — this iteration introduces no new implementation work." and omit the phase headings.
+
+### Phase 1. <short name>
+**Delivers:** <what works at the end of this phase, in one line>
+**Unblocks:** <what later phases need from this — or "foundation" if it's the bedrock of the delta>
+- AC1.1
+- AC1.2
+
+### Phase 2. <short name>
+**Delivers:** <…>
+**Depends on:** Phase 1 (<which piece>)
+- AC2.1   _(if AC2 is `[delta]`; skip `[regression]`/`[adopted]` ACs)_
+
 ## Open questions
 
 <Keep the header even if empty.>
