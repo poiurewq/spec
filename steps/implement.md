@@ -31,12 +31,14 @@ Read `state.yaml` first; validate phase. Write `state.yaml` only when the user c
 
 5. **Kickoff stage.** The kickoff prompt is **generated**, not templated — the orchestrator extracts the exact context this phase needs and embeds it inline so the fresh worker session does minimal exploration before writing code.
 
+   **Selection over transcription.** Your job here is to *select*, not to dump. The worker has the full spec at `spec/spec.md` and can read it. Verbatim text in the prompt is for items the worker must internalize before writing code — anything else should be a line-number pointer the worker can follow on demand. A kickoff prompt that pastes 18 invariants when only 3 apply to this phase is worse than one that names the 3 and points to the rest by line range: it dilutes attention away from what actually matters. Bias toward terse and pointed; the worker will read the source if it needs more.
+
    **5a. Extract context from `spec/spec.md`** (record line ranges as you go — the prompt will cite them):
 
    - **Phase block:** the `### Phase <N>` heading, its `**Delivers:**` line, and its `**Depends on:**` / `**Unblocks:**` clause. Capture the line range.
-   - **Phase ACs (verbatim):** for each leaf AC ID listed under this phase, find its full text in the `## Acceptance criteria` tree. Capture both the ID-and-text and the source line for each.
+   - **Phase ACs (verbatim):** for each leaf AC ID listed under this phase, find its full text in the `## Acceptance criteria` tree. Capture both the ID-and-text and the source line for each. ACs *are* the work — these stay verbatim.
    - **Adjacent phases:** the headings + Delivers lines of phase `<N-1>` (already done) and phase `<N+1>` (not yet started), if they exist. These bound the scope. Capture line ranges only — do not embed verbatim.
-   - **Constraints to preserve (verbatim):** all items under `## Invariants`, `## Provisional invariants`, and any `[adopted]`-tagged ACs in the AC tree. Capture verbatim *and* line ranges.
+   - **Constraints to preserve (selectively):** read all items under `## Invariants`, `## Provisional invariants`, and any `[adopted]`-tagged ACs. Pick out only the items plausibly load-bearing for this phase's scope. Embed the selected items verbatim. Always cite the section's full line range so the worker can scan the rest if needed. If you cannot tell whether an item applies, include it — the bar is "plausibly relevant," not "definitely relevant."
    - **Deferred items:** the line range of `## Test-pending`, if present. Do not embed — just point.
    - **Mode-specific context** from `state.yaml`:
      - `mode: adopted` → note that `[adopted]` ACs are unverified claims about pre-existing behavior; if the worker finds them already satisfied, minimal-touch is correct.
@@ -65,14 +67,15 @@ Read `state.yaml` first; validate phase. Write `state.yaml` only when the user c
    - <AC-ID>: <verbatim AC text>   (spec.md:<line>)
 
    ## Constraints — do not regress these
-   <If Invariants present:>
-   Invariants (spec.md:<start>-<end>):
-   - <verbatim invariant 1>
-   - <verbatim invariant 2>
-   <If Provisional invariants present, same shape.>
-   <If [adopted] ACs present:>
-   [adopted] ACs — claims about existing behavior to preserve (spec.md:<start>-<end>):
-   - <AC-ID>: <verbatim text>
+   <Embed only the invariants / provisional invariants / [adopted] ACs you judged plausibly load-bearing for this phase in 5a. For each, include verbatim text + a one-line note on why it's relevant here. Always cite the source section's full line range so the worker can read the unselected items on demand.>
+   <If Invariants selected:>
+   Invariants (full list at spec.md:<start>-<end>; selected here as relevant to this phase):
+   - <verbatim invariant>  — relevant because <one line>
+   <If Provisional invariants selected, same shape.>
+   <If [adopted] ACs selected:>
+   [adopted] ACs — claims about existing behavior to preserve (full list at spec.md:<start>-<end>; selected here):
+   - <AC-ID>: <verbatim text>  — relevant because <one line>
+   <If you selected nothing from a section, omit the section entirely — do not write "none selected.">
 
    ## Out of scope
    - Phase <N+1>+ ACs (spec.md:<line-range-of-later-phases>) — do not pre-build.
