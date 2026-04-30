@@ -1,6 +1,6 @@
 ---
 name: spec
-description: Guide the user through a deliberate, iterative specification-development workflow for software projects (greenfield, iteration, or adoption of an existing brownfield project). Activates on /spec and its subcommands (/spec interview, /spec adopt, /spec seed, /spec review, /spec revise, /spec check, /spec implement, /spec verify, /spec close, /spec decide, /spec help). Maintains artifacts under ./spec/ with an explicit state machine in ./spec/state.yaml.
+description: Guide the user through a deliberate, iterative specification-development workflow for software projects (greenfield, iteration, or adoption of an existing brownfield project). Activates on /spec and its subcommands (/spec setup, /spec interview, /spec adopt, /spec seed, /spec review, /spec revise, /spec check, /spec implement, /spec verify, /spec close, /spec decide, /spec help). Maintains artifacts under ./spec/ with an explicit state machine in ./spec/state.yaml.
 ---
 
 # /spec — Specification development skill
@@ -16,7 +16,7 @@ Human-driven, agent-assisted spec-development: Socratic interview gated by a sel
 3. **Condensed diamond.** At every non-trivial decision, enumerate ≥3 alternatives before committing. Losers → `decisions.log`.
 4. **Plain text + git.** All artifacts under `./spec/`. User commits; skill proposes messages.
 5. **Separate conversations for generative steps.** Interview, revise, and close deserve fresh sessions. Seed drafting and persona reviews are bounded sub-agents.
-6. **Sub-agent model is Sonnet; always pass `background: false`.** Pass `model: "sonnet"` in every Agent invocation unless a specific step explicitly calls for a different model. `/spec verify` and `/spec adopt` additionally use `subagent_type: "Explore"`. Always include `background: false` explicitly in every Agent invocation — every step that spawns a sub-agent has downstream logic (verify the report exists, present evidence, ask the user to judge) that depends on the sub-agent's result, so the parent session must always wait for it in the foreground.
+6. **Sub-agent model is Sonnet; always pass `background: false`.** Pass `model: "sonnet"` in every Agent invocation unless a specific step explicitly calls for a different model. `/spec verify` and `/spec adopt` additionally use `subagent_type: "Explore"`, but only after a **triage step** — if scope is narrow (few ACs/invariants or a small project), the orchestrator gathers evidence directly without spawning; see each step file for the exact triage criteria. Always include `background: false` explicitly in every Agent invocation — every step that spawns a sub-agent has downstream logic (verify the report exists, present evidence, ask the user to judge) that depends on the sub-agent's result, so the parent session must always wait for it in the foreground.
 7. **Sub-agents that write files must have a fallback.** Every sub-agent prompt that instructs the agent to write to a path under `spec/` must include the instruction: *"Attempt the Write tool for the target path. If Write is denied, retry once; if still denied, include the full intended file content verbatim in your final reply inside a fenced code block labeled with the target absolute path, so the parent session can write it. Never report success without either having written the file or having dumped its full content."* The parent session must then check: if the file does not exist after the sub-agent returns, extract the dumped content and write it directly.
 8. **Evidence, not verdict.** `/spec verify` gathers evidence; the user judges pass/fail.
 9. **State is explicit.** `spec/state.yaml` is the single source of truth for phase, iteration number, and mode. Read at the start of every subcommand; write at the end.
@@ -26,6 +26,7 @@ Human-driven, agent-assisted spec-development: Socratic interview gated by a sel
 | Input | Action |
 |---|---|
 | `/spec` (bare) | Detect state and report (procedure below) |
+| `/spec setup` | Read `steps/setup.md` |
 | `/spec interview` (optional `--iteration N`) | Read `steps/interview.md` |
 | `/spec adopt` (optional `--iteration N`) | Read `steps/adopt.md` |
 | `/spec seed` | Read `steps/seed.md` |

@@ -18,7 +18,10 @@ Read state.yaml first; validate phase. Write state.yaml on completion.
 
 3. **Capture current spec.md SHA.** Use `git log -1 --format=%H -- spec/spec.md` to record it; include in the report header for traceability.
 
-4. **Spawn `Explore` sub-agent.** Agent tool with `subagent_type: "Explore"` and `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**. Prompt:
+4. **Triage and gather evidence.** Before deciding to spawn, count the total leaf ACs and invariant entries in `spec/spec.md` (read it now if not already done). Also estimate source breadth: `find . -mindepth 1 -maxdepth 2 -not -path '*/\.*' -not -path '*/node_modules/*' -type d | wc -l`.
+
+   - **Direct path — handle in-session** if **all** hold: total leaf ACs + invariants ≤ 5, AND source code is concentrated in ≤ 3 directories. Use Bash `grep`/`find` and Read to locate evidence for each AC and invariant. Write the report yourself to `spec/archive/<FILENAME>` using the exact structure shown in the sub-agent prompt below. Proceed to step 5.
+   - **Sub-agent path** — if any condition above fails (wide scope, many ACs, or breadth makes targeted passes unreliable): use the Agent tool with `subagent_type: "Explore"` and `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**. Prompt:
 
    > Read `spec/spec.md`. For **each acceptance criterion** in the AC tree (at every level — AC1, AC1.1, AC1.2, etc.):
    >

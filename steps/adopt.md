@@ -56,7 +56,12 @@ Initialize `spec/` for a project that already has code and (optionally) a rough 
    will ratify, correct, or extend this content before `/spec seed` runs._
    ```
 
-7. **Spawn the adoption Explore sub-agent.** Use the Agent tool with `subagent_type: "Explore"`, `model: "sonnet"`, thoroughness `"very thorough"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7** (since the sub-agent appends to a file). Prompt:
+7. **Triage and ingest.** Before spawning, assess project scope:
+   - Run `find . -not -path '*/\.*' -not -path '*/node_modules/*' -type f | wc -l` (file count).
+   - Run `find . -mindepth 1 -maxdepth 1 -not -name '.*' -type d | wc -l` (top-level directory count).
+
+   - **Direct path — handle in-session** if **all** hold: rough spec source is `none` (no external doc to parse), AND file count ≤ 20, AND the user named specific focus paths (not "entire project directory"). Read those paths directly with Read and Bash. Write the ingestion sections yourself directly into the session file using the structure shown in the sub-agent prompt below. Proceed to step 8.
+   - **Sub-agent path** — if any condition above fails (rough spec doc provided, project is large, or scope is entire codebase): use the Agent tool with `subagent_type: "Explore"`, `model: "sonnet"`, thoroughness `"very thorough"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7** (since the sub-agent appends to a file). Prompt:
 
    > You are ingesting an existing project for adoption into a spec-development workflow. Produce synthesized context that a Socratic interview will later ratify.
    >

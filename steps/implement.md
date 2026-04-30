@@ -99,7 +99,10 @@ Read `state.yaml` first; validate phase. Write `state.yaml` only when the user c
 
    **5e. Tell the user:** "Open a fresh conversation in this repo, paste the prompt above, implement phase `<N>`, then return here and re-run `/spec implement`. Do not commit between sessions — the per-phase audit uses uncommitted working-tree state to scope evidence." Stop.
 
-6. **Audit stage.** Determine filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-implement-phase<N>.md`. Spawn an `Explore` sub-agent with `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**:
+6. **Audit stage.** Determine filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-implement-phase<N>.md`. Before spawning, triage scope using the leaf AC count for phase `<N>` (already extracted in step 5a).
+
+   - **Direct path — handle in-session** if the phase has ≤ 3 leaf ACs: use Bash `grep`/`find` and Read to gather evidence for each AC and run the invariant regression check. Write the audit report yourself to the filename above using the structure shown in the sub-agent prompt below. Proceed to step 7.
+   - **Sub-agent path** — if the phase has > 3 leaf ACs, or if the invariant scope is wide enough that a single-pass grep would be unreliable: spawn an `Explore` sub-agent with `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**:
 
    > Read `spec/spec.md`. From the `## Implementation phases` section, identify phase `<N>` and the leaf AC IDs it covers. For **each AC in this phase only** (do not audit other phases or the full spec):
    >
