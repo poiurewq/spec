@@ -92,7 +92,9 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
 
    After the sub-agent returns, verify the report exists. If not, extract the dumped content and write it directly. If zero drift items were found across all three sections, tell the user "No drift detected. Spec and code are aligned." and stop.
 
-4. **Turn 1 — Present drift items with suggested buckets.** Show the user a numbered list of drift items (regardless of source). For each item, suggest a bucket with one-line rationale. **Do not classify silently — the user makes the final call.** The four buckets:
+4. **Match against deferred items.** If `spec/deferred.md` exists and contains items, for each drift item check whether it could be a *promotion* of an existing deferred item — i.e., the code now implements something the user previously shelved. The skill **suggests** matches by comparing drift descriptions to deferred-item titles and descriptions; the user confirms or denies each suggested match. This is suggestion-only — never auto-link. Carry confirmed matches forward to step 5 as `→ promotes D-XXX` annotations on the relevant drift items.
+
+5. **Turn 1 — Present drift items with suggested buckets.** Show the user a numbered list of drift items (regardless of source). For each item, suggest a bucket with one-line rationale. Annotate any item carrying a confirmed match from step 4 with `→ promotes D-XXX`. **Do not classify silently — the user makes the final call.** The five buckets:
 
    1. **Decision-only** — append to `decisions.log` via `/spec decide`'s entry format; `spec.md` untouched. Phase unchanged.
       *Suggest when:* the drift is a non-load-bearing implementation choice (library/algorithm pick, naming, internal refactor) that no AC or invariant constrains.
@@ -102,54 +104,67 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
       *Suggest when:* an existing AC's truth value changes, ACs are added or removed, or invariants change.
    4. **Major / contested** — edit `spec.md`; phase drops to `in-review`, forcing a fresh persona review pass.
       *Suggest when:* the drift implies a goal/scope rethink, the change cascades across multiple ACs, or the user themselves is unsure of the right resolution.
+   5. **Defer** — append to `spec/deferred.md` via `steps/defer.md`'s automatic-invocation pattern; `spec.md` untouched. Phase unchanged.
+      *Suggest when:* the drift is real but the user judges it shouldn't be ratified into this iteration's spec — it's a future-iteration concern. Use this when the spec change would require iteration-level rethinking that the user wants to defer rather than handle now.
+
+   **Promotion interaction (cross-cuts buckets 2–4).** A bucket-2/3/4 item annotated `→ promotes D-XXX` will additionally remove `D-XXX` from `spec/deferred.md` and write a one-line `decisions.log` entry recording the promotion (handled in step 7).
 
    End the turn with:
 
    > For each drift item, tell me:
-   > - The bucket you want (1/2/3/4), or `reject` if it isn't real drift.
+   > - The bucket you want (1/2/3/4/5), or `reject` if it isn't real drift.
    > - Your override rationale if you're overriding my suggestion.
+   > - For any item I flagged as `→ promotes D-XXX`: confirm or deny the link.
 
-5. **Turn 2 — User addresses items.** User responds per item. During dialogue:
+6. **Turn 2 — User addresses items.** User responds per item. During dialogue:
    - For any "unsure" item, apply **condensed diamond** — enumerate ≥3 ways to resolve the drift with tradeoffs before helping the user converge on a bucket.
    - Log significant choices to `decisions.log` per `steps/decide.md` (under the current iteration's header). In particular, every override of the suggested bucket gets a one-line decision entry capturing *why*.
    - Do **not** apply changes yet. Wait until the user signals all items are addressed (or explicitly deferred to a later reconcile).
 
-6. **Turn 3 — Apply.** Compute the **final phase** from the highest-severity bucket used:
+7. **Turn 3 — Apply.** Compute the **final phase** from the highest-severity bucket used:
    - Any bucket-4 item → final phase `in-review`.
    - Else any bucket-3 item → final phase `revised`.
-   - Else (only buckets 1 and 2) → phase unchanged.
+   - Else (only buckets 1, 2, and 5) → phase unchanged.
 
-   **6a. `phases_implemented` impact check.** If any bucket-3 or bucket-4 item changes or removes an AC that lives in a phase already in `phases_implemented`, list each affected phase and ask:
+   **7a. `phases_implemented` impact check.** If any bucket-3 or bucket-4 item changes or removes an AC that lives in a phase already in `phases_implemented`, list each affected phase and ask:
 
    > Phase `<N>` is in `phases_implemented` but its AC `<ID>` is being modified/removed. Drop phase `<N>` from `phases_implemented` (it will need re-implementation) or keep it (the change describes what's already built)?
 
    Honor the user's per-phase answer. Do not auto-clear.
 
-   **6b. Bucket 1 items.** For each, append an entry to `decisions.log` per `steps/decide.md`'s entry format. Use `**Context:**` line `during /spec reconcile (iteration <n>)`.
+   **7b. Bucket 1 items.** For each, append an entry to `decisions.log` per `steps/decide.md`'s entry format. Use `**Context:**` line `during /spec reconcile (iteration <n>)`.
 
-   **6c. Bucket 2 items.** Apply spec.md edits inline as a unified diff (small) or via direct `Write` (large) — same shape as `/spec revise` Turn 3. **MECE re-check** before applying. In iteration/adopted modes, verify `[delta]` / `[regression]` / `[adopted]` tags are still correct.
+   **7c. Bucket 2 items.** Apply spec.md edits inline as a unified diff (small) or via direct `Write` (large) — same shape as `/spec revise` Turn 3. **MECE re-check** before applying. In iteration/adopted modes, verify `[delta]` / `[regression]` / `[adopted]` tags are still correct.
 
-   **6d. Bucket 3 / 4 items.** Apply spec.md edits the same way. **MECE re-check.** Tag any new ACs that record pre-existing behavior with `[adopted]`.
+   **7d. Bucket 3 / 4 items.** Apply spec.md edits the same way. **MECE re-check.** Tag any new ACs that record pre-existing behavior with `[adopted]`.
 
-   **6e. Update state.yaml.**
+   **7e. Bucket 5 items (defer).** For each, append a new item to `spec/deferred.md` per `steps/defer.md`'s automatic-invocation pattern, with source `via /spec reconcile bucket: defer (iteration <n>)`. Use the drift item's description as the deferred item's description; ask the user for a category (default `feature`).
+
+   **7f. Promotion side effects.** For each bucket-2/3/4 item annotated `→ promotes D-XXX` (confirmed in step 4):
+   - Remove `D-XXX` from `spec/deferred.md`.
+   - Append a one-line `decisions.log` entry per `steps/decide.md`: title `Promoted D-XXX into iteration <n> spec via reconcile`, context `via /spec reconcile (iteration <n>)`.
+
+   **7g. Update state.yaml.**
    - `last_command: /spec reconcile`, `last_command_at: <ISO timestamp>`.
    - `phase`: set per the final-phase computation above.
-   - `phases_implemented`: drop any phase numbers the user marked for re-implementation in 6a.
+   - `phases_implemented`: drop any phase numbers the user marked for re-implementation in 7a.
    - `latest_review_stamp`: leave unchanged. (When phase drops to `in-review`, the user will run `/spec review` next, which writes a fresh stamp.)
 
-   **6f. Propose commit.**
+   **7h. Propose commit.**
    ```
-   git add spec/spec.md spec/decisions.log spec/state.yaml spec/archive/<drift-report-if-any>
+   git add spec/spec.md spec/decisions.log spec/deferred.md spec/state.yaml spec/archive/<drift-report-if-any>
    git commit -m "spec: reconcile drift (iteration <n>)"
    ```
 
-7. **Tell the user what's next** based on the final phase:
+   Drop `spec/deferred.md` from the `git add` line if no bucket-5 items and no promotion side effects occurred. Drop `spec/spec.md` if no buckets 2–4 occurred.
+
+8. **Tell the user what's next** based on the final phase:
    - **Unchanged phase (`converged` / `verified`):** "Reconcile complete. Phase remains `<phase>`. <If verified and any spec.md edits were applied:> Note: `spec.md` changed; consider re-running `/spec verify` for a fresh full-spec audit."
    - **`revised`:** "Reconcile complete. Phase dropped to `revised` because of structural changes. Run `/spec check` to re-confirm convergence (likely cheap if the changes were truly contained), then `/spec implement` or `/spec verify` as appropriate."
    - **`in-review`:** "Reconcile complete. Phase dropped to `in-review` because of major changes. Run `/spec review` for a fresh persona pass, then `/spec revise` and `/spec check`."
 
 ## Notes for downstream steps
 
-- **Interaction with `/spec verify`.** When phase stays at `verified` after a bucket-2 reconcile, the existing verify report is *partially stale* — it was rendered against the prior `spec.md`. `state.yaml` does not capture this; the message in step 7 nudges the user. Do not invalidate `latest_verify` automatically (the report is still useful for the unchanged ACs).
-- **Interaction with `/spec implement`.** A reconcile during `converged` that touches phase ACs may invalidate per-phase audit reports for the affected phases. Step 6a covers the explicit case (dropping phases from `phases_implemented`); the per-phase audit files in `spec/archive/` are not deleted — they remain as historical record and will be superseded when the phase is re-implemented.
+- **Interaction with `/spec verify`.** When phase stays at `verified` after a bucket-2 reconcile, the existing verify report is *partially stale* — it was rendered against the prior `spec.md`. `state.yaml` does not capture this; the message in step 8 nudges the user. Do not invalidate `latest_verify` automatically (the report is still useful for the unchanged ACs).
+- **Interaction with `/spec implement`.** A reconcile during `converged` that touches phase ACs may invalidate per-phase audit reports for the affected phases. Step 7a covers the explicit case (dropping phases from `phases_implemented`); the per-phase audit files in `spec/archive/` are not deleted — they remain as historical record and will be superseded when the phase is re-implemented.
 - **Decision-only reconciles do not require a drift report file.** If all items are bucket 1 (or come from a description with no scan), no `*-reconcile-drift.md` archive file is produced. Only the codebase-scan entry mode writes that file.

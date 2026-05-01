@@ -20,13 +20,17 @@ Read state.yaml first; validate phase. Write state.yaml at the end of Turn 2.
 
    > GAP #<n> — AC<ref>: <one-line reason from report>
    >
-   > To close this iteration, please either:
-   > (a) Fix it in code and re-run `/spec verify`, then resume `/spec close`, or
-   > (b) Accept the gap with a rationale (one or two sentences).
+   > To close this iteration, please pick one:
+   > (a) Fix it in code and re-run `/spec verify`, then resume `/spec close`.
+   > (b) Accept the gap with a rationale (one or two sentences) — recorded in `takeaway.md`.
+   > (c) Defer it to a future iteration — recorded as a new item in `spec/deferred.md`. Especially natural for `[adopted]` ACs that turned out to be feature requests rather than verified existing behavior.
 
-4. **Stop.** Wait for the user to address each GAP/UNCLEAR. Do not proceed until every one is either (a) resolved by re-verification or (b) accepted with a rationale in the current conversation.
+4. **Stop.** Wait for the user to address each GAP/UNCLEAR. Do not proceed until every one is (a) resolved by re-verification, (b) accepted with a rationale, or (c) deferred.
 
-5. **Collect accepted-gap rationales in working memory** (the conversation). These will be passed into the takeaway-generation prompt in Turn 2 — do **not** write them to `state.yaml` (they belong in `takeaway.md`, not state).
+5. **Apply per-item resolutions.**
+   - **(a)** items: handled outside this command (user re-runs `/spec verify`).
+   - **(b)** items: collect rationales in working memory (the conversation). These will be passed into the takeaway-generation prompt in Turn 2 — do **not** write them to `state.yaml` (they belong in `takeaway.md`, not state).
+   - **(c)** items: append each to `spec/deferred.md` per `steps/defer.md`'s automatic-invocation pattern, with source `via /spec close gap resolution (iteration <n>)`. Use the AC ID and one-line reason from the verify report as the deferred item's title and description. Emit one-line confirmation per item: "Deferred: <title> (D-XXX)." Do **not** propose a mid-step commit; the Turn 2 commit picks up `spec/deferred.md`.
 
 ## Turn 2 — Generate takeaway and archive
 

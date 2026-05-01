@@ -1,6 +1,6 @@
 # /spec decide — Decision log
 
-Record a significant decision to `spec/decisions.log`.
+Record a significant decision to `spec/decisions.log`. **Past-tense only** — what was already decided (positively, negatively-permanent, or meta). For future-tense items (feature requests, bugs, ideas not yet committed to any iteration), use `/spec defer` instead, which writes to `spec/deferred.md`.
 
 ## State machine
 

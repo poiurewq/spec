@@ -1,6 +1,6 @@
 ---
 name: spec
-description: Guide the user through a deliberate, iterative specification-development workflow for software projects (greenfield, iteration, or adoption of an existing brownfield project). Activates on /spec and its subcommands (/spec setup, /spec interview, /spec adopt, /spec seed, /spec review, /spec revise, /spec check, /spec implement, /spec verify, /spec reconcile, /spec close, /spec decide, /spec help). Maintains artifacts under ./spec/ with an explicit state machine in ./spec/state.yaml.
+description: Guide the user through a deliberate, iterative specification-development workflow for software projects (greenfield, iteration, or adoption of an existing brownfield project). Activates on /spec and its subcommands (/spec setup, /spec interview, /spec adopt, /spec seed, /spec review, /spec revise, /spec check, /spec implement, /spec verify, /spec reconcile, /spec close, /spec decide, /spec defer, /spec help). Maintains artifacts under ./spec/ with an explicit state machine in ./spec/state.yaml.
 ---
 
 # /spec — Specification development skill
@@ -38,6 +38,7 @@ Human-driven, agent-assisted spec-development: Socratic interview gated by a sel
 | `/spec reconcile` (optional `"<description>"` or `--from-verify`) | Read `steps/reconcile.md` |
 | `/spec close` | Read `steps/close.md` |
 | `/spec decide` or `/spec decide "<text>"` | Read `steps/decide.md` |
+| `/spec defer` (optional `"<item>"...` or `--resolve D-XXX drop "<rationale>"`) | Read `steps/defer.md` |
 | `/spec help` | Read `steps/help.md` |
 
 ## File layout (in user's cwd)
@@ -46,7 +47,8 @@ Human-driven, agent-assisted spec-development: Socratic interview gated by a sel
 spec/
 ├── spec.md                              # current iteration target
 ├── takeaway.md                          # appears after first /spec close
-├── decisions.log                        # cross-iteration, append-only
+├── decisions.log                        # cross-iteration, append-only (past-tense)
+├── deferred.md                          # cross-iteration backlog (future-tense, mutable)
 ├── state.yaml                           # phase machine state (skill-writes only)
 └── archive/                             # flat, v-prefixed; working + snapshots
     ├── v<NNN>-YYYY-MM-DD-HHMM-interview.md

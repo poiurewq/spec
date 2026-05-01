@@ -60,18 +60,38 @@ If starting fresh (no state.yaml or coming from `closed`):
      > "Should I spawn an Explore sub-agent to summarize the relevant code into a `## Current state [from-code]` section for this interview, or would you rather describe current state yourself?"
      If yes, triage before spawning: if the user named ≤ 3 specific files or a single narrow directory, read those paths directly with Read and Bash, then append the `## Current state [from-code]` section yourself — no sub-agent needed. Otherwise (broad directory, "entire codebase", or many paths) spawn Agent with `subagent_type: "Explore"`, `model: "sonnet"`, prompt narrowly scoped to the user-specified paths with output appended to the session file. The sub-agent prompt must include the **write-fallback instruction from SKILL.md principle 7** — attempt to append to the session file; on Write denial, retry once, then dump full content in the reply. After the sub-agent returns, verify the append landed; if not, write it from the parent session.
 
-3. **Intent-focused questions.** Ask about *what should change*, not *what exists*. Examples:
+3. **Deferred-items triage** (before intent questions; after context ingestion). If `spec/deferred.md` exists and contains at least one item:
+
+   a. Read it. Sort items **stalest-first**: descending by `Defer count`, then ascending by `Last touched`. Items with `Defer count ≥ 3` are flagged with a `⚠ stale` marker in the prompt below.
+
+   b. Present:
+
+   > Deferred items on the plate from prior iterations:
+   >
+   > - D-001 — <title>  (deferred since iter <n>; last touched iter <m>; defer count <c>) <⚠ stale if applicable>
+   > - D-002 — ...
+   >
+   > For each: **include** in this iteration, **continue deferring**, or **drop** (with rationale)?
+
+   c. **Per-item resolution.** Apply the user's choice:
+      - **Include** — remove the item from `spec/deferred.md`. Append a short summary of the item to the interview session file under a new `### Deferred items pulled in` subsection (so `/spec seed` sees them as iteration intent). Append a one-line entry to `spec/decisions.log` per `steps/decide.md`: title `Promoted D-XXX into iteration <n> spec`, decision `Pulled deferred item into this iteration's commitments.`, context `via /spec interview triage (iteration <n>)`.
+      - **Continue deferring** — bump `Last touched` to today + current iteration; increment `Defer count`. No `decisions.log` entry.
+      - **Drop** — remove from `spec/deferred.md`. Append a one-line entry to `spec/decisions.log` per `steps/decide.md`: title `Dropped deferred item D-XXX`, rationale supplied by user, context `via /spec interview triage (iteration <n>)`.
+
+   d. If `spec/deferred.md` is empty or missing, skip this step silently. (Mention "No deferred items on the plate." only if the user explicitly asks.)
+
+4. **Intent-focused questions.** Ask about *what should change*, not *what exists*. Examples:
    - "Given <existing thing>, should this iteration extend it, replace it, or leave it alone and build alongside?"
    - "What must *not* break?"
    - "What's the motivating trigger for this iteration?"
    - Apply the **condensed diamond** at interpretation forks.
 
-4. **Tag every answer** in the transcript:
+5. **Tag every answer** in the transcript:
    - `[from-code]` — facts about the current codebase (from user or Explore sub-agent)
    - `[from-user]` — user decisions, preferences, priorities (not externally verifiable)
    - `[from-research]` — external facts (API docs, compatibility, pricing) with source reference
 
-5. **Cover these axes:** Motivation, Current state (ingested above), Change delta, Invariants, Goal, Constraints, Success criteria, Scope boundary.
+6. **Cover these axes:** Motivation, Current state (ingested above), Change delta, Invariants, Goal, Constraints, Success criteria, Scope boundary.
 
 ## Adoption protocol (`mode: adopted`)
 

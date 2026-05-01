@@ -39,7 +39,8 @@ Most AI-assisted development fails at the input stage. `/spec` gives you a disci
 | `/spec verify` | Audit code against spec |
 | `/spec reconcile` (optional `"<text>"` or `--from-verify`) | Capture drift between code and spec post-converge; bucket-classify and route |
 | `/spec close` | Finalize iteration, generate takeaway |
-| `/spec decide "<text>"` | Log a decision |
+| `/spec decide "<text>"` | Log a decision (past-tense — what was already decided) |
+| `/spec defer "<item>"...` | Shelve item(s) to `deferred.md` for next-iteration triage (future-tense backlog). Batch-capable; `--resolve D-XXX drop` to remove |
 | `/spec help` | This help |
 
 ### First time using `/spec` in a repo?
@@ -105,6 +106,7 @@ Starts right after `/spec close` of a prior iteration:
 
 - `spec.md` — current spec (the "Seed")
 - `takeaway.md` — last-closed iteration's shipped reality (appears after first `/spec close`)
-- `decisions.log` — cross-iteration decision history
+- `decisions.log` — cross-iteration decision history (past-tense, append-only)
+- `deferred.md` — cross-iteration backlog (future-tense, mutable; triaged at next interview)
 - `state.yaml` — current phase (skill-managed)
 - `archive/` — timestamped working files + per-iteration snapshots, all in one flat directory with `<date>-v<n>-<kind>.md` names

@@ -47,7 +47,7 @@ Read `state.yaml` first; validate phase. Write `state.yaml` only when the user c
    - **Phase ACs (verbatim):** for each leaf AC ID listed under this phase, find its full text in the `## Acceptance criteria` tree. Capture both the ID-and-text and the source line for each. ACs *are* the work — these stay verbatim.
    - **Adjacent phases:** the headings + Delivers lines of phase `<N-1>` (already done) and phase `<N+1>` (not yet started), if they exist. These bound the scope. Capture line ranges only — do not embed verbatim.
    - **Constraints to preserve (selectively):** read all items under `## Invariants`, `## Provisional invariants`, and any `[adopted]`-tagged ACs. Pick out only the items plausibly load-bearing for this phase's scope. Embed the selected items verbatim. Always cite the section's full line range so the worker can scan the rest if needed. If you cannot tell whether an item applies, include it — the bar is "plausibly relevant," not "definitely relevant."
-   - **Deferred items:** the line range of `## Test-pending`, if present. Do not embed — just point.
+   - **Deferred items live outside `spec.md`** in `spec/deferred.md`. Do not include or reference — they are explicitly out of scope for any implement worker.
    - **Mode-specific context** from `state.yaml`:
      - `mode: adopted` → note that `[adopted]` ACs are unverified claims about pre-existing behavior; if the worker finds them already satisfied, minimal-touch is correct.
      - `mode: iteration` → if `spec/takeaway.md` exists, capture the path; the worker may consult it for prior-iteration context.
@@ -87,7 +87,6 @@ Read `state.yaml` first; validate phase. Write `state.yaml` only when the user c
 
    ## Out of scope
    - Phase <N+1>+ ACs (spec.md:<line-range-of-later-phases>) — do not pre-build.
-   - Items under ## Test-pending (spec.md:<line>) — deferred; ignore.
    <If mode == adopted:>
    - [adopted] ACs not in this phase's scope are verification targets for /spec verify, not implementation work for you.
 

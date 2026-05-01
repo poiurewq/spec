@@ -25,7 +25,8 @@ Force discipline at the input stage of software projects: surface assumptions, e
 spec/
 ├── spec.md                              # current iteration target
 ├── takeaway.md                          # appears after first /spec close
-├── decisions.log                        # cross-iteration, append-only
+├── decisions.log                        # cross-iteration, append-only (past-tense)
+├── deferred.md                          # cross-iteration backlog (future-tense, mutable)
 ├── state.yaml                           # phase machine state (skill-writes only)
 └── archive/                             # flat, v-prefixed; working + snapshots
     ├── v<NNN>-YYYY-MM-DD-HHMM-interview.md
@@ -51,7 +52,8 @@ spec/
 | `/spec verify` | Explore subagent audits code against spec, renders evidence |
 | `/spec reconcile` | Pull post-converge code drift back into the spec — bidirectional ingestion. Four-bucket triage (decision-only / minor / structural / major) routes phase regression accordingly |
 | `/spec close` | Finalize iteration: resolve gaps, generate takeaway, archive |
-| `/spec decide` | Log a decision (explicit or auto-triggered mid-step) |
+| `/spec decide` | Log a decision (explicit or auto-triggered mid-step) — past-tense |
+| `/spec defer` | Shelve a feature request, bug, or idea to `deferred.md` for triage at the next iteration's interview — future-tense backlog. Accepts batch invocation; `--resolve D-XXX drop` for housekeeping |
 | `/spec help` | Print user-facing help |
 
 ## State machine
@@ -117,6 +119,7 @@ Six phases per iteration, linear except for the review↔revise↔check loop:
 | `/spec reconcile` | `converged` · `verified` | unchanged · `revised` · `in-review` (depends on highest-severity bucket used) |
 | `/spec close` | `verified` | `closed` (**refused** if already `closed`) |
 | `/spec decide` | any | unchanged |
+| `/spec defer` | any (refused only if no `spec/`) | unchanged |
 | `/spec help` | any | unchanged |
 
 Every step file includes a `## State machine` section at the top declaring these constraints and what it writes back to `state.yaml`.
@@ -136,7 +139,7 @@ The skill does **not** implement code itself. Implementation happens in fresh co
 **Recipe (no phases declared, or single-phase iteration):**
 
 1. After `converged`, open a fresh conversation. Prompt:
-   > Read `spec/spec.md`. Implement every `[delta]` AC. Treat `[adopted]` ACs, `## Invariants`, and `## Provisional invariants` as constraints to preserve — do not regress them. Items under `## Test-pending` are deferred to a future iteration; do not pick them up now.
+   > Read `spec/spec.md`. Implement every `[delta]` AC. Treat `[adopted]` ACs, `## Invariants`, and `## Provisional invariants` as constraints to preserve — do not regress them. Do not consult `spec/deferred.md` — it lists items shelved for future iterations and is out of scope.
 2. When deltas are done, open a new conversation and run `/spec verify`.
 
 Why orchestration earns its keep even though implementation itself is low-ambiguity: phases are the natural commit boundary, "which phase is next" is genuinely state worth tracking, and per-phase audits catch regressions earlier and at smaller scope than waiting for a single end-of-iteration `/spec verify`. The rigor still lives on the verification side — the implementation step is a thin wrapper around "give the user the right prompt, then audit what they did."
