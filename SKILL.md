@@ -1,6 +1,6 @@
 ---
 name: spec
-description: Guide the user through a deliberate, iterative specification-development workflow for software projects (greenfield, iteration, or adoption of an existing brownfield project). Activates on /spec and its subcommands (/spec setup, /spec interview, /spec adopt, /spec seed, /spec review, /spec revise, /spec check, /spec implement, /spec verify, /spec close, /spec decide, /spec help). Maintains artifacts under ./spec/ with an explicit state machine in ./spec/state.yaml.
+description: Guide the user through a deliberate, iterative specification-development workflow for software projects (greenfield, iteration, or adoption of an existing brownfield project). Activates on /spec and its subcommands (/spec setup, /spec interview, /spec adopt, /spec seed, /spec review, /spec revise, /spec check, /spec implement, /spec verify, /spec reconcile, /spec close, /spec decide, /spec help). Maintains artifacts under ./spec/ with an explicit state machine in ./spec/state.yaml.
 ---
 
 # /spec — Specification development skill
@@ -35,6 +35,7 @@ Human-driven, agent-assisted spec-development: Socratic interview gated by a sel
 | `/spec check` | Read `steps/check.md` |
 | `/spec implement` (optional `<phase-N>`) | Read `steps/implement.md` |
 | `/spec verify` | Read `steps/verify.md` |
+| `/spec reconcile` (optional `"<description>"` or `--from-verify`) | Read `steps/reconcile.md` |
 | `/spec close` | Read `steps/close.md` |
 | `/spec decide` or `/spec decide "<text>"` | Read `steps/decide.md` |
 | `/spec help` | Read `steps/help.md` |
@@ -99,8 +100,8 @@ phases_implemented: [<int>]              # phase numbers user confirmed via /spe
 | `seeded` | `/spec review` |
 | `in-review` | `/spec revise` |
 | `revised` | `/spec check` (or `/spec review` for another loop). |
-| `converged` | `/spec implement` to walk the `## Implementation phases` one phase at a time (each phase is implemented in a fresh session; the skill orchestrates kickoff and per-phase audit). When all phases are confirmed, run `/spec verify` for the full-spec audit. If the spec has no phases declared, implement freely in a fresh session and run `/spec verify` directly. |
-| `verified` | `/spec close` (or `/spec implement` to re-audit a phase, harmless). |
+| `converged` | `/spec implement` to walk the `## Implementation phases` one phase at a time (each phase is implemented in a fresh session; the skill orchestrates kickoff and per-phase audit). When all phases are confirmed, run `/spec verify` for the full-spec audit. If the spec has no phases declared, implement freely in a fresh session and run `/spec verify` directly. Use `/spec reconcile` to absorb drift discovered mid-implementation. |
+| `verified` | `/spec close` (or `/spec implement` to re-audit a phase, harmless; or `/spec reconcile` to absorb drift surfaced by the verify report). |
 | `closed` | `/spec interview` (start next iteration) |
 
 ## Mode

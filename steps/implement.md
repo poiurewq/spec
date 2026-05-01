@@ -23,11 +23,19 @@ Read `state.yaml` first; validate phase. Write `state.yaml` only when the user c
    - If `done == [1..total]`, all phases are confirmed. Tell the user: "All phases implemented and per-phase verified. Run `/spec verify` for the full-spec audit." Stop.
    - User may pass an explicit phase number as argument (`/spec implement 2`); honor it but warn if it skips earlier unconfirmed phases.
 
-4. **Branch on per-phase state.** A phase has two stages: *kickoff* (user has not yet implemented) and *audit* (user has implemented; ready to verify). Distinguish by checking whether the working tree has changes since the most recent commit that modified `spec/state.yaml`'s `phases_implemented` field (or, on the very first phase, since the converge commit).
+4. **Branch on per-phase state.** A phase has two stages: *kickoff* (user has not yet implemented) and *audit* (user has implemented; ready to verify). Distinguish by looking for non-`spec/` changes since the **state boundary** — the most recent commit that modified `spec/state.yaml`'s `phases_implemented` field (or, on the very first phase, the converge commit).
 
-   Heuristic: run `git log -1 --format=%H -- spec/state.yaml` to find the last state commit, then `git diff <that-SHA>..HEAD` and `git status --short`. If there are any non-`spec/` file changes since that point, treat as **audit** stage. Otherwise **kickoff**.
+   Detection procedure:
+   - Run `git log -1 --format=%H -- spec/state.yaml` to find the state-boundary SHA. (Sanity-check it actually touches `phases_implemented`; if not, walk back with `git log --format=%H -- spec/state.yaml` until you find one that does, or fall back to the converge commit.)
+   - Collect the **phase diff candidates**: `git log --format='%h %s' <boundary>..HEAD` (commits since boundary) plus `git status --short` (uncommitted). Filter to entries that touch non-`spec/` files.
+   - If both lists are empty → **kickoff**.
+   - Otherwise → **audit**. The union of files touched across these commits + uncommitted changes is the **phase diff scope** — pass it to step 6.
 
-   When ambiguous, ask the user: "Have you implemented phase `<N>` already, or are we starting it?"
+   **Disambiguation.** If the candidate commits look noisy or unrelated to phase `<N>` — e.g., more than ~5 commits since the boundary, commit messages that don't read like phase-`<N>` work, or commits that appear to span multiple phases — show the user the candidate list (`<short-SHA> <subject>` per line, plus any uncommitted file count) and ask:
+
+   > "Which commits implement phase `<N>`? Reply with a range (`abc123..def456`), a comma-separated list (`abc123,def456`), `all` to use everything since the state boundary, or `none` if you haven't implemented this phase yet."
+
+   Honor the user's answer as the authoritative scope. If the user answers `none`, treat as **kickoff**. Also ask when the candidate list is empty but the user previously indicated they had implemented (e.g., re-running after a manual stash).
 
 5. **Kickoff stage.** The kickoff prompt is **generated**, not templated — the orchestrator extracts the exact context this phase needs and embeds it inline so the fresh worker session does minimal exploration before writing code.
 
@@ -92,19 +100,21 @@ Read `state.yaml` first; validate phase. Write `state.yaml` only when the user c
    ## Design decisions — surface, don't decide
    The ACs and constraints above pin down *what* must be true, not *how* to get there. Where the spec is silent or ambiguous on an implementation choice — data shape, API surface, library selection, error semantics, naming, file/module layout, migration vs. rewrite, sync vs. async, etc. — do not pick unilaterally. Stop, name the fork and the options you see (with the tradeoffs you'd weigh), and ask the user before writing code down that path. The working principle that "the user judges" should apply to design decisions during implementation. A small clarifying question now is cheaper than rework after audit.
 
-   When done, do not commit. Tell the user the implementation is ready for audit; they will re-run `/spec implement` from the orchestrating session, which uses uncommitted git state to scope the audit.
+   When done, tell the user the implementation is ready for audit; they will re-run `/spec implement` from the orchestrating session. You may commit your work normally (one or more commits is fine) or leave it uncommitted — the orchestrator scopes the audit from commits since the last `spec/state.yaml` commit plus any uncommitted changes, and will ask the user to disambiguate if the boundary is unclear.
    ```
 
    Render this prompt inside a single fenced code block so the user can copy it cleanly.
 
-   **5e. Tell the user:** "Open a fresh conversation in this repo, paste the prompt above, implement phase `<N>`, then return here and re-run `/spec implement`. Do not commit between sessions — the per-phase audit uses uncommitted working-tree state to scope evidence." Stop.
+   **5e. Tell the user:** "Open a fresh conversation in this repo, paste the prompt above, implement phase `<N>`, then return here and re-run `/spec implement`. Committing between sessions is fine — the audit will scan recent git log entries (since the last `state.yaml` commit) plus any uncommitted changes to find the phase diff, and will ask you to confirm the commit range if it's ambiguous." Stop.
 
 6. **Audit stage.** Determine filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-implement-phase<N>.md`. Before spawning, triage scope using the leaf AC count for phase `<N>` (already extracted in step 5a).
 
-   - **Direct path — handle in-session** if the phase has ≤ 3 leaf ACs: use Bash `grep`/`find` and Read to gather evidence for each AC and run the invariant regression check. Write the audit report yourself to the filename above using the structure shown in the sub-agent prompt below. Proceed to step 7.
-   - **Sub-agent path** — if the phase has > 3 leaf ACs, or if the invariant scope is wide enough that a single-pass grep would be unreliable: spawn an `Explore` sub-agent with `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**:
+   The **phase diff scope** from step 4 (commits + any uncommitted files) tells the auditor *where to look first*. Pass it through as a hint — the auditor still reads code at HEAD (committed state takes precedence; uncommitted is layered on top via `git diff`).
 
-   > Read `spec/spec.md`. From the `## Implementation phases` section, identify phase `<N>` and the leaf AC IDs it covers. For **each AC in this phase only** (do not audit other phases or the full spec):
+   - **Direct path — handle in-session** if the phase has ≤ 3 leaf ACs: use Bash `grep`/`find` and Read to gather evidence for each AC and run the invariant regression check. For changed files, read the current state at HEAD; for any uncommitted modifications, layer in `git diff` output. Write the audit report yourself to the filename above using the structure shown in the sub-agent prompt below. Proceed to step 7.
+   - **Sub-agent path** — if the phase has > 3 leaf ACs, or if the invariant scope is wide enough that a single-pass grep would be unreliable: spawn an `Explore` sub-agent with `model: "sonnet"`. Include the phase diff scope (commit SHAs + file list) in the prompt. The prompt must include the **write-fallback instruction from SKILL.md principle 7**:
+
+   > Read `spec/spec.md`. From the `## Implementation phases` section, identify phase `<N>` and the leaf AC IDs it covers. The orchestrator has identified the phase diff as: commits `<SHA-list-or-"none">`; uncommitted files `<file-list-or-"none">`. Use this as a starting point but do not limit yourself to it — search the whole codebase if AC evidence might live elsewhere. For **each AC in this phase only** (do not audit other phases or the full spec):
    >
    > - Search the codebase for evidence the AC is implemented.
    > - Render one verdict: **PASS**, **GAP**, or **UNCLEAR**.
@@ -153,12 +163,19 @@ Read `state.yaml` first; validate phase. Write `state.yaml` only when the user c
 10. **On confirm:**
     - Append `<N>` to `phases_implemented` in `state.yaml`.
     - Update `last_command: /spec implement`, `last_command_at`.
-    - Propose:
-      ```
-      git add <implementation files> spec/archive/<implement-audit-file> spec/state.yaml
-      git commit -m "spec: implement phase <N> — <phase short name> (iteration <n>)"
-      ```
-      List the implementation files explicitly (use `git status --short` output) so the user can edit the `git add` line if needed. Do not run.
+    - Propose a commit. The shape depends on whether the implementation is already committed:
+      - **All implementation already committed** (no uncommitted non-`spec/` files):
+        ```
+        git add spec/archive/<implement-audit-file> spec/state.yaml
+        git commit -m "spec: confirm phase <N> audit — <phase short name> (iteration <n>)"
+        ```
+      - **Some implementation still uncommitted**: list those files explicitly (from `git status --short`) so the user can decide whether to roll them into one commit or split:
+        ```
+        git add <uncommitted implementation files> spec/archive/<implement-audit-file> spec/state.yaml
+        git commit -m "spec: implement phase <N> — <phase short name> (iteration <n>)"
+        ```
+
+      Do not run; let the user edit the `git add` line.
     - If `len(phases_implemented) == total`, append: "All phases confirmed. Next: `/spec verify` for the full-spec audit." Otherwise: "Next phase: `<N+1>`. Run `/spec implement` again after implementing it in a fresh session."
 
 ## Notes

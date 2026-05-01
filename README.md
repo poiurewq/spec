@@ -44,6 +44,7 @@ spec/
 | `/spec check` | Convergence test (two consecutive wording-only revisions) |
 | `/spec implement` | Orchestrates per-phase implementation: kickoff prompt for a fresh session, then per-phase Explore audit on re-run. Does **not** implement code itself |
 | `/spec verify` | Explore subagent audits code against spec, renders evidence |
+| `/spec reconcile` | Pull post-converge code drift back into the spec — bidirectional ingestion. Four-bucket triage (decision-only / minor / structural / major) routes phase regression accordingly |
 | `/spec close` | Finalize iteration: resolve gaps, generate takeaway, archive |
 | `/spec decide` | Log a decision (explicit or auto-triggered mid-step) |
 | `/spec help` | Print user-facing help |
@@ -82,6 +83,10 @@ Six phases per iteration, linear except for the review↔revise↔check loop:
                                                      ▼
                                                  verified ◄─── /spec verify (re-run)
                                                      │
+                                                     │ (drift discovered? /spec reconcile —
+                                                     │  buckets 1–2 stay in place; bucket 3
+                                                     │  drops to revised; bucket 4 to in-review)
+                                                     │
                                                      │ /spec close (gaps resolved)
                                                      ▼
                                                   closed
@@ -103,6 +108,7 @@ Six phases per iteration, linear except for the review↔revise↔check loop:
 | `/spec check` | `revised` | `converged` or stays `revised` |
 | `/spec implement` | `converged` · `verified` (re-audit) | unchanged (appends to `phases_implemented` on user confirmation) |
 | `/spec verify` | `converged` · `verified` (re-run) | `verified` |
+| `/spec reconcile` | `converged` · `verified` | unchanged · `revised` · `in-review` (depends on highest-severity bucket used) |
 | `/spec close` | `verified` | `closed` (**refused** if already `closed`) |
 | `/spec decide` | any | unchanged |
 | `/spec help` | any | unchanged |

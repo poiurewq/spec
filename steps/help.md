@@ -36,6 +36,7 @@ Most AI-assisted development fails at the input stage. `/spec` gives you a disci
 | `/spec check` | Test convergence |
 | `/spec implement` (optional `<phase-N>`) | Per-phase orchestration: kickoff prompt + per-phase audit |
 | `/spec verify` | Audit code against spec |
+| `/spec reconcile` (optional `"<text>"` or `--from-verify`) | Capture drift between code and spec post-converge; bucket-classify and route |
 | `/spec close` | Finalize iteration, generate takeaway |
 | `/spec decide "<text>"` | Log a decision |
 | `/spec help` | This help |
