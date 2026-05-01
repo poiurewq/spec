@@ -39,7 +39,7 @@ Most AI-assisted development fails at the input stage. `/spec` gives you a disci
 | `/spec verify` | Audit code against spec |
 | `/spec reconcile` (optional `"<text>"` or `--from-verify`) | Capture drift between code and spec post-converge; bucket-classify and route |
 | `/spec close` | Finalize iteration, generate takeaway |
-| `/spec decide "<text>"` | Log a decision (past-tense — what was already decided) |
+| `/spec decide "<text>"` | Log a decision with stable `DEC-NNN` ID (past-tense — what was already decided). Optional `--supersedes DEC-NNN` flags this as revising an earlier decision |
 | `/spec defer "<item>"...` | Shelve item(s) to `deferred.md` for next-iteration triage (future-tense backlog). Batch-capable; `--resolve D-XXX drop` to remove |
 | `/spec help` | This help |
 

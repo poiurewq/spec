@@ -142,7 +142,7 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
 
    **7f. Promotion side effects.** For each bucket-2/3/4 item annotated `→ promotes D-XXX` (confirmed in step 4):
    - Remove `D-XXX` from `spec/deferred.md`.
-   - Append a one-line `decisions.log` entry per `steps/decide.md`: title `Promoted D-XXX into iteration <n> spec via reconcile`, context `via /spec reconcile (iteration <n>)`.
+   - Append a `decisions.log` entry per `steps/decide.md`'s auto-invocation protocol: title `Promoted D-XXX into iteration <n> spec via reconcile`, decision `The drift item resolving D-XXX has been ratified into spec.md.`, related `Promoted from D-XXX, <list of AC IDs introduced/modified>`, context `via /spec reconcile (iteration <n>)`.
 
    **7g. Update state.yaml.**
    - `last_command: /spec reconcile`, `last_command_at: <ISO timestamp>`.

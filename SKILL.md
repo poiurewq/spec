@@ -37,7 +37,7 @@ Human-driven, agent-assisted spec-development: Socratic interview gated by a sel
 | `/spec verify` | Read `steps/verify.md` |
 | `/spec reconcile` (optional `"<description>"` or `--from-verify`) | Read `steps/reconcile.md` |
 | `/spec close` | Read `steps/close.md` |
-| `/spec decide` or `/spec decide "<text>"` | Read `steps/decide.md` |
+| `/spec decide` or `/spec decide "<text>"` (optional `--supersedes DEC-NNN`) | Read `steps/decide.md` |
 | `/spec defer` (optional `"<item>"...` or `--resolve D-XXX drop "<rationale>"`) | Read `steps/defer.md` |
 | `/spec help` | Read `steps/help.md` |
 

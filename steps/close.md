@@ -65,14 +65,15 @@ Once all GAPs/UNCLEARs are resolved or accepted:
    - `spec/spec.md` → `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-spec.md`
    - `spec/takeaway.md` → `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-takeaway.md`
 
-6. **Append iteration-boundary marker** to `spec/decisions.log`:
-   ```
-   ## <date> — Iteration <n> closed
-   **Spec SHA at close:** <sha>
-   **Accepted gaps:** <n> (details in archive/v<NNN>-<YYYY-MM-DD-HHMM>-takeaway.md)
-   
-   ---
-   ```
+6. **Append iteration-boundary marker** to `spec/decisions.log` per `steps/decide.md`'s entry format. Compute next `DEC-NNN`. Use:
+   - **Title:** `Iteration <n> closed`
+   - **Iteration:** `<n>` (current, before any future increment)
+   - **Decision:** `Closed iteration <n> at spec.md SHA <short-sha>.`
+   - **Rationale:** `<n> accepted gaps; details in archive/v<NNN>-<YYYY-MM-DD-HHMM>-takeaway.md.`
+   - **Alternatives considered:** omit.
+   - **Supersedes:** omit.
+   - **Related:** omit unless a specific AC's accepted-gap rationale is the headline reason for closure.
+   - **Context:** `auto-logged during /spec close (iteration <n>)`
 
 7. **Update state.yaml:** `phase: closed`, `last_command: /spec close`, `last_command_at`. Reset `phases_implemented: []` so the next iteration starts with an empty per-phase audit trail.
 

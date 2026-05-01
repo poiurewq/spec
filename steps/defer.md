@@ -90,10 +90,11 @@ For housekeeping outside an interview — drop a deferred item the user no longe
 
 3. **Remove the item from `spec/deferred.md`.**
 
-4. **Append to `spec/decisions.log`** per `steps/decide.md`'s entry format:
+4. **Append to `spec/decisions.log`** per `steps/decide.md`'s auto-invocation protocol:
    - Title: `Dropped deferred item D-XXX — <item title>`
    - Decision: `Dropped deferred item D-XXX without implementing.`
    - Rationale: `<user's rationale>`
+   - Related: `Dropped from D-XXX`
    - Context: `via /spec defer --resolve (iteration <n>)`
 
 5. **Propose commit:**

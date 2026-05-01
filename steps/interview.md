@@ -74,9 +74,9 @@ If starting fresh (no state.yaml or coming from `closed`):
    > For each: **include** in this iteration, **continue deferring**, or **drop** (with rationale)?
 
    c. **Per-item resolution.** Apply the user's choice:
-      - **Include** — remove the item from `spec/deferred.md`. Append a short summary of the item to the interview session file under a new `### Deferred items pulled in` subsection (so `/spec seed` sees them as iteration intent). Append a one-line entry to `spec/decisions.log` per `steps/decide.md`: title `Promoted D-XXX into iteration <n> spec`, decision `Pulled deferred item into this iteration's commitments.`, context `via /spec interview triage (iteration <n>)`.
+      - **Include** — remove the item from `spec/deferred.md`. Append a short summary of the item to the interview session file under a new `### Deferred items pulled in` subsection (so `/spec seed` sees them as iteration intent). Append an entry to `spec/decisions.log` per `steps/decide.md`'s auto-invocation protocol: title `Promoted D-XXX into iteration <n> spec`, decision `Pulled deferred item D-XXX into this iteration's commitments.`, related `Promoted from D-XXX`, context `via /spec interview triage (iteration <n>)`.
       - **Continue deferring** — bump `Last touched` to today + current iteration; increment `Defer count`. No `decisions.log` entry.
-      - **Drop** — remove from `spec/deferred.md`. Append a one-line entry to `spec/decisions.log` per `steps/decide.md`: title `Dropped deferred item D-XXX`, rationale supplied by user, context `via /spec interview triage (iteration <n>)`.
+      - **Drop** — remove from `spec/deferred.md`. Append an entry to `spec/decisions.log` per `steps/decide.md`'s auto-invocation protocol: title `Dropped deferred item D-XXX`, decision `Dropped deferred item D-XXX without implementing.`, rationale supplied by user, context `via /spec interview triage (iteration <n>)`.
 
    d. If `spec/deferred.md` is empty or missing, skip this step silently. (Mention "No deferred items on the plate." only if the user explicitly asks.)
 
