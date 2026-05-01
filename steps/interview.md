@@ -97,17 +97,17 @@ If starting fresh (no state.yaml or coming from `closed`):
 
 This runs when `/spec adopt` already created the session file and transitioned stage to `interviewing`. `latest_interview` in state.yaml points to the pre-populated file.
 
-The adoption interview is a **two-phase** flow with an explicit checkpoint between them. Phase A reconciles the written spec artifact (which `/spec seed` will produce next) against shipped code — it is documentation hygiene disguised as Q&A. Phase B is the forward-looking Socratic interview about what this iteration is *for*. Do not blur the two: finish Phase A and pass its mini-gate before starting Phase B.
+The adoption interview is a **two-part** flow with an explicit checkpoint between them. Part A reconciles the written spec artifact (which `/spec seed` will produce next) against shipped code — it is documentation hygiene disguised as Q&A. Part B is the forward-looking Socratic interview about what this iteration is *for*. Do not blur the two: finish Part A and pass its mini-gate before starting Part B.
 
-### Setup (both phases)
+### Setup (both parts)
 
 1. **Open the existing session file.** Do **not** create a new one. Read its `## Adopted context (pre-interview)` section in full — it contains `[from-code]` bullets, `[from-rough-spec]` claims (if any), and an Ambiguities list produced by the adoption Explore sub-agent.
 
-2. **Append a new `## Socratic interview` section** below the pre-populated context. Under it, create two subsections up front — `### Phase A — Ratify current state` and `### Phase B — Intent for this iteration` — so transcript entries land under the correct phase as you go.
+2. **Append a new `## Socratic interview` section** below the pre-populated context. Under it, create two subsections up front — `### Part A — Ratify current state` and `### Part B — Intent for this iteration` — so transcript entries land under the correct part as you go.
 
-### Phase A — Ratify current state (reconciliation)
+### Part A — Ratify current state (reconciliation)
 
-The goal of Phase A is a single output: a current-state snapshot the user affirms is faithful to shipped reality. No forward-looking questions here.
+The goal of Part A is a single output: a current-state snapshot the user affirms is faithful to shipped reality. No forward-looking questions here.
 
 3. **Orienting turn (scoped to the summary only).** Distill the pre-populated context into 3–5 bullets and ask: *"Does this summary accurately describe what exists today? Flag anything wrong, missing, or stated as fact that's actually aspirational. (We'll walk the individual ambiguities next — this turn is just about the high-level shape.)"* Record corrections as `[from-user]` and note which pre-populated claims they override.
 
@@ -116,33 +116,33 @@ The goal of Phase A is a single output: a current-state snapshot the user affirm
    - **(b) Spec is truth, code has a bug** → the eventual `spec/spec.md` should keep the spec's claim; the code needs to change to match. Tag the resolution `[build-change-todo]` with a one-line description of the needed code change. These TODOs flow into `/spec seed` as deferred work / acceptance criteria, not dropped.
    - **(c) Both stale** → the user articulates a third answer; tag `[from-user]` and note both prior claims are superseded.
 
-   **Modifier — `[iteration-scope]`:** any of (a)/(b)/(c) may additionally be flagged `[iteration-scope]` when the user affirms the resolution is true *for this iteration only* and expects to revisit it in a future iteration (e.g., "no `SettingsViewModel` yet — we'll extract one next iteration when logic grows"). This keeps the current spec purely descriptive of shipped reality while recording the forward intent. Items tagged `[iteration-scope]` are appended to `spec/deferred.md` per `steps/defer.md`'s automatic-invocation pattern, with source `via /spec interview Phase A (iteration <n>)`, category default `refactor` (override at user's request), and description summarizing the transitional shape (e.g., "Extract `SettingsViewModel` once logic grows beyond inline state"). They appear in the next iteration's interview triage like any other deferred item. Use sparingly — most resolutions are permanent; this modifier is for shapes the user explicitly names as transitional.
+   **Modifier — `[iteration-scope]`:** any of (a)/(b)/(c) may additionally be flagged `[iteration-scope]` when the user affirms the resolution is true *for this iteration only* and expects to revisit it in a future iteration (e.g., "no `SettingsViewModel` yet — we'll extract one next iteration when logic grows"). This keeps the current spec purely descriptive of shipped reality while recording the forward intent. Items tagged `[iteration-scope]` are appended to `spec/deferred.md` per `steps/defer.md`'s automatic-invocation pattern, with source `via /spec interview Part A (iteration <n>)`, category default `refactor` (override at user's request), and description summarizing the transitional shape (e.g., "Extract `SettingsViewModel` once logic grows beyond inline state"). They appear in the next iteration's interview triage like any other deferred item. Use sparingly — most resolutions are permanent; this modifier is for shapes the user explicitly names as transitional.
 
    Apply the **condensed diamond** when resolution shape has more than these three interpretations (rare, but e.g., timing thresholds may have a range of reasonable values).
 
-5. **Phase A mini-gate (ratified-snapshot checkpoint).** When every ambiguity is resolved, produce a consolidated **Ratified current state** block in the session file — the original pre-interview context with each ambiguity replaced by its chosen resolution, inline. Present it and ask: *"Is this now a faithful, drift-free description of what exists? This is the baseline Phase B will build on; we won't re-open these points after this."*
+5. **Part A mini-gate (ratified-snapshot checkpoint).** When every ambiguity is resolved, produce a consolidated **Ratified current state** block in the session file — the original pre-interview context with each ambiguity replaced by its chosen resolution, inline. Present it and ask: *"Is this now a faithful, drift-free description of what exists? This is the baseline Part B will build on; we won't re-open these points after this."*
    - **Any "no":** re-open the specific items the user names; return to step 4 for those items only.
-   - **"Yes":** proceed to Phase B. The ratified snapshot is frozen for this iteration.
+   - **"Yes":** proceed to Part B. The ratified snapshot is frozen for this iteration.
 
-### Phase B — Intent for this iteration (Socratic)
+### Part B — Intent for this iteration (Socratic)
 
-The goal of Phase B is to articulate *what iteration N is for*, given the ratified baseline. The adoption iteration is special — its delta may legitimately be empty (pure ratification) or it may include real changes.
+The goal of Part B is to articulate *what iteration N is for*, given the ratified baseline. The adoption iteration is special — its delta may legitimately be empty (pure ratification) or it may include real changes.
 
 6. **Intent questions.** Common shapes:
-   - "Is this iteration meant to *ratify* the current behavior (no delta, just formalize the spec), to *extend* it, or to *correct* drift between the rough spec and reality?" (If the user named `[build-change-todo]` items in Phase A, those are candidates for the "correct drift" answer.)
+   - "Is this iteration meant to *ratify* the current behavior (no delta, just formalize the spec), to *extend* it, or to *correct* drift between the rough spec and reality?" (If the user named `[build-change-todo]` items in Part A, those are candidates for the "correct drift" answer.)
    - "What must *not* change?" (invariants)
    - "What's the trigger for adopting the skill now — bug, compliance, handoff, team growth?"
    - Cover axes: Motivation, Change delta (may be empty — that's valid), Invariants, Scope boundary, Success criteria for the adoption iteration.
    - Apply the **condensed diamond** at interpretation forks.
 
-7. **Tag every answer** in the transcript (applies to both phases):
+7. **Tag every answer** in the transcript (applies to both parts):
    - `[from-code]` — facts about the current codebase (user- or Explore-sourced)
    - `[from-rough-spec]` — claims inherited from the rough spec doc
    - `[from-user]` — user decisions, preferences, priorities (not externally verifiable)
    - `[from-research]` — external facts with source reference
-   - `[build-change-todo]` — Phase A ambiguity resolutions where the code needs to change to match the spec's retained claim (adoption mode only)
-   - `[iteration-scope]` — modifier on a Phase A resolution indicating the current answer holds only for this iteration and is expected to be revisited in a future iteration (adoption mode only; always paired with one of the primary tags)
-   - `[invariant-provisional]` — modifier on a Phase B invariant indicating the invariant stands, but is explicitly *revisable under pressure* from specific real-world evidence (e.g., a user-surfaced bug that motivates refinement of a checklist or mechanism). Distinct from a regular invariant (change requires `/spec decide`) and from `[iteration-scope]` (scheduled change in a known future iteration): the trigger is evidence-driven refinement, not an iteration boundary. Use when the user wants to commit to an invariant's shape but acknowledge it hasn't been battle-tested enough to freeze rigidly. Adoption mode only; always paired with an invariant description and a named trigger (what evidence would motivate revision).
+   - `[build-change-todo]` — Part A ambiguity resolutions where the code needs to change to match the spec's retained claim (adoption mode only)
+   - `[iteration-scope]` — modifier on a Part A resolution indicating the current answer holds only for this iteration and is expected to be revisited in a future iteration (adoption mode only; always paired with one of the primary tags)
+   - `[invariant-provisional]` — modifier on a Part B invariant indicating the invariant stands, but is explicitly *revisable under pressure* from specific real-world evidence (e.g., a user-surfaced bug that motivates refinement of a checklist or mechanism). Distinct from a regular invariant (change requires `/spec decide`) and from `[iteration-scope]` (scheduled change in a known future iteration): the trigger is evidence-driven refinement, not an iteration boundary. Use when the user wants to commit to an invariant's shape but acknowledge it hasn't been battle-tested enough to freeze rigidly. Adoption mode only; always paired with an invariant description and a named trigger (what evidence would motivate revision).
 
 ## Clarity gate (all modes)
 

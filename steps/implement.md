@@ -23,7 +23,7 @@ Read `state.yaml` first; validate stage. Write `state.yaml` only when the user c
    - If `done == [1..total]`, all phases are confirmed. Tell the user: "All phases implemented and per-phase verified. Run `/spec verify` for the full-spec audit." Stop.
    - User may pass an explicit phase number as argument (`/spec implement 2`); honor it but warn if it skips earlier unconfirmed phases.
 
-4. **Branch on per-phase state.** A phase has two stages: *kickoff* (user has not yet implemented) and *audit* (user has implemented; ready to verify). Distinguish by looking for non-`spec/` changes since the **state boundary** — the most recent commit that modified `spec/state.yaml`'s `phases_implemented` field (or, on the very first phase, the converge commit).
+4. **Branch on per-phase state.** A phase is in one of two states relative to the orchestrator's view: *kickoff* (user has not yet implemented) or *audit* (user has implemented; ready to verify). Distinguish by looking for non-`spec/` changes since the **state boundary** — the most recent commit that modified `spec/state.yaml`'s `phases_implemented` field (or, on the very first phase, the converge commit).
 
    Detection procedure:
    - Run `git log -1 --format=%H -- spec/state.yaml` to find the state-boundary SHA. (Sanity-check it actually touches `phases_implemented`; if not, walk back with `git log --format=%H -- spec/state.yaml` until you find one that does, or fall back to the converge commit.)
@@ -37,7 +37,7 @@ Read `state.yaml` first; validate stage. Write `state.yaml` only when the user c
 
    Honor the user's answer as the authoritative scope. If the user answers `none`, treat as **kickoff**. Also ask when the candidate list is empty but the user previously indicated they had implemented (e.g., re-running after a manual stash).
 
-5. **Kickoff stage.** The kickoff prompt is **generated**, not templated — the orchestrator extracts the exact context this phase needs and embeds it inline so the fresh worker session does minimal exploration before writing code.
+5. **Kickoff.** The kickoff prompt is **generated**, not templated — the orchestrator extracts the exact context this phase needs and embeds it inline so the fresh worker session does minimal exploration before writing code.
 
    **Selection over transcription.** Your job here is to *select*, not to dump. The worker has the full spec at `spec/spec.md` and can read it. Verbatim text in the prompt is for items the worker must internalize before writing code — anything else should be a line-number pointer the worker can follow on demand. A kickoff prompt that pastes 18 invariants when only 3 apply to this phase is worse than one that names the 3 and points to the rest by line range: it dilutes attention away from what actually matters. Bias toward terse and pointed; the worker will read the source if it needs more.
 
@@ -106,7 +106,7 @@ Read `state.yaml` first; validate stage. Write `state.yaml` only when the user c
 
    **5e. Tell the user:** "Open a fresh conversation in this repo, paste the prompt above, implement phase `<N>`, then return here and re-run `/spec implement`. Committing between sessions is fine — the audit will scan recent git log entries (since the last `state.yaml` commit) plus any uncommitted changes to find the phase diff, and will ask you to confirm the commit range if it's ambiguous." Stop.
 
-6. **Audit stage.** Determine filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-implement-phase<N>.md`. Before spawning, triage scope using the leaf AC count for phase `<N>` (already extracted in step 5a).
+6. **Audit.** Determine filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-implement-phase<N>.md`. Before spawning, triage scope using the leaf AC count for phase `<N>` (already extracted in step 5a).
 
    The **phase diff scope** from step 4 (commits + any uncommitted files) tells the auditor *where to look first*. Pass it through as a hint — the auditor still reads code at HEAD (committed state takes precedence; uncommitted is layered on top via `git diff`).
 
