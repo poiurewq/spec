@@ -4,7 +4,7 @@ Record a significant decision to `spec/decisions.log`. **Past-tense only** — w
 
 ## State machine
 
-**Allowed from phases:** any
+**Allowed from stages:** any
 **Transitions to:** unchanged
 **Re-run behavior:** always allowed.
 
@@ -88,7 +88,7 @@ Entry format:
     git commit -m "decide: <DEC-NNN — short title>"
     ```
 
-11. No state.yaml update (decisions don't change phase).
+11. No state.yaml update (decisions don't change stage).
 
 ## Protocol for automatic invocation
 

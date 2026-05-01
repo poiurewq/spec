@@ -4,13 +4,13 @@ Conduct a Socratic interview to turn a vague project idea (or iteration request)
 
 ## State machine
 
-**Allowed from phases:** (no state.yaml — first run) · `closed` (starts iteration N+1) · `interviewing` (resume existing — covers both `mode: iteration`/`greenfield` resumes *and* `mode: adopted` continuation after `/spec adopt`)
-**Transitions to:** `interviewing`. The phase stays `interviewing` until `/spec seed` runs — the gate merely *permits* `/spec seed`.
-**Re-run behavior:** If phase is `interviewing`, resume the existing session file (read `latest_interview` from state.yaml). If phase is `closed`, start a new iteration (iteration number = `prior + 1` unless `--iteration N` is provided).
+**Allowed from stages:** (no state.yaml — first run) · `closed` (starts iteration N+1) · `interviewing` (resume existing — covers both `mode: iteration`/`greenfield` resumes *and* `mode: adopted` continuation after `/spec adopt`)
+**Transitions to:** `interviewing`. The stage stays `interviewing` until `/spec seed` runs — the gate merely *permits* `/spec seed`.
+**Re-run behavior:** If stage is `interviewing`, resume the existing session file (read `latest_interview` from state.yaml). If stage is `closed`, start a new iteration (iteration number = `prior + 1` unless `--iteration N` is provided).
 
-Before executing: read `spec/state.yaml`. If missing, treat as first run. If phase is neither allowed nor missing, report mismatch and suggest the right command.
+Before executing: read `spec/state.yaml`. If missing, treat as first run. If stage is neither allowed nor missing, report mismatch and suggest the right command.
 
-After completing each turn: update state.yaml with `phase`, `mode`, `iteration`, `started_at` (on first question of iteration), `last_command`, `last_command_at`, `latest_interview`.
+After completing each turn: update state.yaml with `stage`, `mode`, `iteration`, `started_at` (on first question of iteration), `last_command`, `last_command_at`, `latest_interview`.
 
 ## Arguments
 
@@ -18,7 +18,7 @@ After completing each turn: update state.yaml with `phase`, `mode`, `iteration`,
 
 ## Mode determination (first substantive turn)
 
-If resuming (phase was already `interviewing`, including an adoption initialized by `/spec adopt`): skip this section and jump to the appropriate protocol below based on `mode` in state.yaml.
+If resuming (stage was already `interviewing`, including an adoption initialized by `/spec adopt`): skip this section and jump to the appropriate protocol below based on `mode` in state.yaml.
 
 If starting fresh (no state.yaml or coming from `closed`):
 
@@ -95,7 +95,7 @@ If starting fresh (no state.yaml or coming from `closed`):
 
 ## Adoption protocol (`mode: adopted`)
 
-This runs when `/spec adopt` already created the session file and transitioned phase to `interviewing`. `latest_interview` in state.yaml points to the pre-populated file.
+This runs when `/spec adopt` already created the session file and transitioned stage to `interviewing`. `latest_interview` in state.yaml points to the pre-populated file.
 
 The adoption interview is a **two-phase** flow with an explicit checkpoint between them. Phase A reconciles the written spec artifact (which `/spec seed` will produce next) against shipped code — it is documentation hygiene disguised as Q&A. Phase B is the forward-looking Socratic interview about what this iteration is *for*. Do not blur the two: finish Phase A and pass its mini-gate before starting Phase B.
 
@@ -151,7 +151,7 @@ When coverage is sufficient (or after ~12 questions, whichever first), read and 
 - **Any "no":** one more targeted question on that axis, then re-present the gate.
 - **All "yes":**
   1. Append `## Conclusion` to the session file summarizing each axis in the user's own phrasing.
-  2. Update state.yaml: `latest_interview` set, `phase` remains `interviewing` (transitions to `seeded` only when `/spec seed` runs).
+  2. Update state.yaml: `latest_interview` set, `stage` remains `interviewing` (transitions to `seeded` only when `/spec seed` runs).
   3. Tell the user: "Interview complete. Start a new conversation and run `/spec seed` to draft the spec."
   4. Propose (optional):
      ```

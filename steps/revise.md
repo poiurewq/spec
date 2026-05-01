@@ -4,11 +4,11 @@ Guide the user through addressing the latest review critiques before proposing a
 
 ## State machine
 
-**Allowed from phases:** `in-review`
+**Allowed from stages:** `in-review`
 **Transitions to:** `revised`
 **Re-run behavior:** Needs fresh reviews to consume. If called outside `in-review`, suggest the right prior step.
 
-Read state.yaml first; validate phase. Write state.yaml after Turn 3.
+Read state.yaml first; validate stage. Write state.yaml after Turn 3.
 
 ## Turn 1 — Read and summarize
 
@@ -45,7 +45,7 @@ Only after the user signals done:
 
 3. After `spec/spec.md` is written (whether via direct `Write` or post-diff approval), proceed to step 4.
 
-4. **Update state.yaml:** `phase: revised`, `last_command: /spec revise`, `last_command_at`. `spec_sha` updates after commit.
+4. **Update state.yaml:** `stage: revised`, `last_command: /spec revise`, `last_command_at`. `spec_sha` updates after commit.
 
 5. **Propose commit:**
    ```

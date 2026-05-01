@@ -4,15 +4,15 @@ Resolve any outstanding GAPs, generate `spec/takeaway.md`, and archive the curre
 
 ## State machine
 
-**Allowed from phases:** `verified`
+**Allowed from stages:** `verified`
 **Transitions to:** `closed`
 **Re-run behavior:** **Refused** if already `closed` — tell user "Iteration N already closed. Run `/spec interview` to start iteration N+1."
 
-Read state.yaml first; validate phase. Write state.yaml at the end of Turn 2.
+Read state.yaml first; validate stage. Write state.yaml at the end of Turn 2.
 
 ## Turn 1 — Review gaps and collect rationale
 
-1. **Validate phase.** Read state.yaml. If `closed`: refuse per above. If not `verified`: suggest the correct prior step.
+1. **Validate stage.** Read state.yaml. If `closed`: refuse per above. If not `verified`: suggest the correct prior step.
 
 2. **Load latest verify report** from `spec/archive/<latest_verify>`.
 
@@ -75,7 +75,7 @@ Once all GAPs/UNCLEARs are resolved or accepted:
    - **Related:** omit unless a specific AC's accepted-gap rationale is the headline reason for closure.
    - **Context:** `auto-logged during /spec close (iteration <n>)`
 
-7. **Update state.yaml:** `phase: closed`, `last_command: /spec close`, `last_command_at`. Reset `phases_implemented: []` so the next iteration starts with an empty per-phase audit trail.
+7. **Update state.yaml:** `stage: closed`, `last_command: /spec close`, `last_command_at`. Reset `phases_implemented: []` so the next iteration starts with an empty per-phase audit trail.
 
 8. **Propose commit:**
    ```

@@ -19,7 +19,7 @@ Human-driven, agent-assisted spec-development: Socratic interview gated by a sel
 6. **Sub-agent model is Sonnet; always pass `background: false`.** Pass `model: "sonnet"` in every Agent invocation unless a specific step explicitly calls for a different model. `/spec verify` and `/spec adopt` additionally use `subagent_type: "Explore"`, but only after a **triage step** — if scope is narrow (few ACs/invariants or a small project), the orchestrator gathers evidence directly without spawning; see each step file for the exact triage criteria. Always include `background: false` explicitly in every Agent invocation — every step that spawns a sub-agent has downstream logic (verify the report exists, present evidence, ask the user to judge) that depends on the sub-agent's result, so the parent session must always wait for it in the foreground.
 7. **Sub-agents that write files must have a fallback.** Every sub-agent prompt that instructs the agent to write to a path under `spec/` must include the instruction: *"Attempt the Write tool for the target path. If Write is denied, retry once; if still denied, include the full intended file content verbatim in your final reply inside a fenced code block labeled with the target absolute path, so the parent session can write it. Never report success without either having written the file or having dumped its full content."* The parent session must then check: if the file does not exist after the sub-agent returns, extract the dumped content and write it directly.
 8. **Evidence, not verdict.** `/spec verify` gathers evidence; the user judges pass/fail.
-9. **State is explicit.** `spec/state.yaml` is the single source of truth for phase, iteration number, and mode. Read at the start of every subcommand; write at the end.
+9. **State is explicit.** `spec/state.yaml` is the single source of truth for stage, iteration number, and mode. Read at the start of every subcommand; write at the end.
 
 ## Routing
 
@@ -49,7 +49,7 @@ spec/
 ├── takeaway.md                          # appears after first /spec close
 ├── decisions.log                        # cross-iteration, append-only (past-tense)
 ├── deferred.md                          # cross-iteration backlog (future-tense, mutable)
-├── state.yaml                           # phase machine state (skill-writes only)
+├── state.yaml                           # stage machine state (skill-writes only)
 └── archive/                             # flat, v-prefixed; working + snapshots
     ├── v<NNN>-YYYY-MM-DD-HHMM-interview.md
     ├── v<NNN>-YYYY-MM-DD-HHMM-<persona>.md   # ontologist / contrarian / simplifier
@@ -66,7 +66,7 @@ Create `spec/` and `spec/archive/` on first use.
 schema_version: 1
 iteration: <int>                 # 1 by default at initialization; user may override with --iteration N via /spec interview or /spec adopt; otherwise increments on post-close interview
 mode: greenfield | iteration | adopted
-phase: interviewing | seeded | in-review | revised | converged | verified | closed
+stage: interviewing | seeded | in-review | revised | converged | verified | closed
 started_at: <ISO timestamp>
 last_command: <command string>
 last_command_at: <ISO timestamp>
@@ -79,24 +79,26 @@ phases_implemented: [<int>]              # phase numbers user confirmed via /spe
 
 **Skill is the sole writer.** Accepted GAP rationales from `/spec close` live in `takeaway.md`, not here.
 
+**Backward compatibility — `phase:` → `stage:` rename.** The `phase:` field was renamed to `stage:` (the values are unchanged: `interviewing | seeded | … | closed`). When you read `state.yaml` and see a legacy `phase:` key instead of `stage:`, treat it as `stage:` — it carries the same meaning and the same value set. On the next write to `state.yaml`, rewrite the key as `stage:` (do not preserve `phase:`). Do not be confused by the old name; do not refuse to operate on legacy state files.
+
 ## `/spec` bare — state detection
 
 1. **If `spec/state.yaml` exists and parses:**
-   - Report: `iteration <n>, mode <mode>, phase <phase>`.
-   - Suggest next command per the phase mapping below.
+   - Report: `iteration <n>, mode <mode>, stage <stage>`.
+   - Suggest next command per the stage mapping below.
 
 2. **If `spec/state.yaml` is missing:**
    - **Empty / missing `spec/`** → suggest `/spec setup` as the canonical onramp (it orients the user and routes to greenfield or brownfield). Direct alternatives — `/spec interview` (greenfield) or `/spec adopt` (brownfield) — also work for users who know what they want.
    - **`spec/` exists with artifacts** → attempt auto-reconstruction:
      a. Scan `spec/archive/` for the highest `v<n>` prefix seen.
      b. Check presence of `spec.md`, `takeaway.md`, latest verify report.
-     c. Infer `phase`, `iteration`, `mode` from what's present.
+     c. Infer `stage`, `iteration`, `mode` from what's present.
      d. Present the inferred state to the user in plain text and ask: *"Does this match your mental model? If yes, I'll write a fresh state.yaml."*
      e. On user confirmation, write `state.yaml` and proceed. On decline, stop and let the user reconcile manually.
 
-3. **Phase → next command mapping:**
+3. **Stage → next command mapping:**
 
-| Phase | Suggested next |
+| Stage | Suggested next |
 |---|---|
 | `interviewing` | Continue `/spec interview` (resume) |
 | `seeded` | `/spec review` |
@@ -114,17 +116,17 @@ phases_implemented: [<int>]              # phase numbers user confirmed via /spe
 
 First `/spec interview` from `[no state]` asks "greenfield or iteration/brownfield?" — if the user selects brownfield adoption, redirect them to `/spec adopt` instead. Otherwise answer is recorded in `state.yaml` as `mode`.
 
-**Iteration-specific work is gated by `phase: closed`.** A user cannot start iteration N+1 until iteration N has been closed with `/spec close` (which produces the takeaway). The state machine enforces this — no need for ad-hoc checks.
+**Iteration-specific work is gated by `stage: closed`.** A user cannot start iteration N+1 until iteration N has been closed with `/spec close` (which produces the takeaway). The state machine enforces this — no need for ad-hoc checks.
 
 ## Initialization arguments
 
 Entry-point subcommands that can create a fresh `spec/state.yaml` accept an optional iteration override:
 
-- `/spec interview --iteration N` — only honored when invoked from `[no state.yaml]` (greenfield init) or from `phase: closed` (iteration N+1 init). Elsewhere a warning is printed and the flag ignored.
-- `/spec adopt --iteration N` — only honored at bootstrap (the only phase `/spec adopt` accepts).
+- `/spec interview --iteration N` — only honored when invoked from `[no state.yaml]` (greenfield init) or from `stage: closed` (iteration N+1 init). Elsewhere a warning is printed and the flag ignored.
+- `/spec adopt --iteration N` — only honored at bootstrap (the only stage `/spec adopt` accepts).
 
 `N` must be a positive integer. Default is `1` for greenfield/adopt; `prior_iteration + 1` for post-close interview. Bare positional integer (`/spec interview 3`, `/spec adopt 3`) is accepted as a shorthand.
 
 ## Commits
 
-After any step that writes `spec/spec.md`, `spec/takeaway.md`, `spec/decisions.log`, or produces archive snapshots, propose the exact `git add` + `git commit` command. Do not run it. `state.yaml` is committed alongside any step that transitions phase.
+After any step that writes `spec/spec.md`, `spec/takeaway.md`, `spec/decisions.log`, or produces archive snapshots, propose the exact `git add` + `git commit` command. Do not run it. `state.yaml` is committed alongside any step that transitions stage.

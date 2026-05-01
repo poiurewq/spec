@@ -4,15 +4,15 @@ Spawn an `Explore` sub-agent to render a per-AC evidence report comparing `spec/
 
 ## State machine
 
-**Allowed from phases:** `converged` · `verified` (re-run)
+**Allowed from stages:** `converged` · `verified` (re-run)
 **Transitions to:** `verified`
 **Re-run behavior:** Allowed freely. Latest report supersedes; old reports retained in archive.
 
-Read state.yaml first; validate phase. Write state.yaml on completion.
+Read state.yaml first; validate stage. Write state.yaml on completion.
 
 ## Protocol
 
-1. **Check preconditions.** Read state.yaml; validate phase. If not `converged` or `verified`, suggest the correct step (commonly `/spec check` if not yet converged).
+1. **Check preconditions.** Read state.yaml; validate stage. If not `converged` or `verified`, suggest the correct step (commonly `/spec check` if not yet converged).
 
 2. **Determine filename.** Iteration `v<NNN>` (zero-padded to 3 digits) + timestamp from state.yaml: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-verify.md`.
 
@@ -67,7 +67,7 @@ Read state.yaml first; validate phase. Write state.yaml on completion.
    - A terse list of every GAP and UNCLEAR with one-line reasons.
    - Reference to full report path for deeper review.
 
-7. **Update state.yaml:** `phase: verified`, `latest_verify: <filename>`, `last_command: /spec verify`, `last_command_at`.
+7. **Update state.yaml:** `stage: verified`, `latest_verify: <filename>`, `last_command: /spec verify`, `last_command_at`.
 
 8. **Next step.** Tell the user:
    - **If any GAPs/UNCLEARs:** "Either address them in code and re-run `/spec verify`, or when ready, run `/spec close` — you'll be asked to provide a rationale for each outstanding gap before closing."

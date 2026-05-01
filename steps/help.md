@@ -1,6 +1,6 @@
 # /spec help — User-facing help
 
-Print the following to the user. If `spec/state.yaml` exists and parses, prepend a one-line status: `You are currently in: iteration <n>, mode <mode>, phase <phase>. Suggested next: /spec <command>.`
+Print the following to the user. If `spec/state.yaml` exists and parses, prepend a one-line status: `You are currently in: iteration <n>, mode <mode>, stage <stage>. Suggested next: /spec <command>.`
 
 ---
 
@@ -27,7 +27,7 @@ Most AI-assisted development fails at the input stage. `/spec` gives you a disci
 
 | Command | What it does |
 |---|---|
-| `/spec` | Report phase; suggest next command |
+| `/spec` | Report stage; suggest next command |
 | `/spec setup` | First-run onboarding — configures permissions, orients you, routes to `/spec interview` (greenfield) or `/spec adopt` (brownfield) |
 | `/spec interview` | Conduct the Socratic interview (optional `--iteration N` at init) |
 | `/spec adopt` | Bootstrap `spec/` for an existing brownfield project with code + optional rough spec doc (optional `--iteration N`) |
@@ -108,5 +108,5 @@ Starts right after `/spec close` of a prior iteration:
 - `takeaway.md` — last-closed iteration's shipped reality (appears after first `/spec close`)
 - `decisions.log` — cross-iteration decision history (past-tense, append-only)
 - `deferred.md` — cross-iteration backlog (future-tense, mutable; triaged at next interview)
-- `state.yaml` — current phase (skill-managed)
+- `state.yaml` — current stage (skill-managed)
 - `archive/` — timestamped working files + per-iteration snapshots, all in one flat directory with `<date>-v<n>-<kind>.md` names

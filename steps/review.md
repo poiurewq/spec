@@ -4,15 +4,15 @@ Three skeptical review passes against the current `spec/spec.md`. Each persona r
 
 ## State machine
 
-**Allowed from phases:** `seeded` · `revised` · `in-review` (re-run with warning)
+**Allowed from stages:** `seeded` · `revised` · `in-review` (re-run with warning)
 **Transitions to:** `in-review`
 **Re-run behavior:** If already `in-review`, warn: *"Reviews for current spec.md already exist (stamp X). Generate a fresh set?"* On yes, new timestamp prefix; old review files stay in archive.
 
-Read state.yaml first; validate phase. Write state.yaml on completion.
+Read state.yaml first; validate stage. Write state.yaml on completion.
 
 ## Protocol
 
-1. **Check preconditions.** Read state.yaml; validate phase. Confirm `spec/spec.md` exists. If uncommitted changes exist, warn and ask whether to review the uncommitted version (usually yes).
+1. **Check preconditions.** Read state.yaml; validate stage. Confirm `spec/spec.md` exists. If uncommitted changes exist, warn and ask whether to review the uncommitted version (usually yes).
 
 2. **Determine timestamp.** Iteration `v<NNN>` (zero-padded to 3 digits) from state.yaml + current `YYYY-MM-DD-HHMM`. Prefix: `v<NNN>-<YYYY-MM-DD-HHMM>`. All three review files share this prefix.
 
@@ -42,9 +42,9 @@ Read state.yaml first; validate phase. Write state.yaml on completion.
    > - **Contrarian:** <one line>
    > - **Simplifier:** <one line>
 
-6. **Update state.yaml:** `phase: in-review`, `latest_review_stamp: <PREFIX>`, `last_command: /spec review`, `last_command_at: <timestamp>`.
+6. **Update state.yaml:** `stage: in-review`, `latest_review_stamp: <PREFIX>`, `last_command: /spec review`, `last_command_at: <timestamp>`.
 
-7. **Propose commit.** Per the global commits policy in `SKILL.md`, review produces archive snapshots and transitions phase, so propose (do not run) the exact commands — both the three critique files and `state.yaml` in one atomic commit:
+7. **Propose commit.** Per the global commits policy in `SKILL.md`, review produces archive snapshots and transitions stage, so propose (do not run) the exact commands — both the three critique files and `state.yaml` in one atomic commit:
 
    ```
    git add spec/archive/<PREFIX>-ontologist.md spec/archive/<PREFIX>-contrarian.md spec/archive/<PREFIX>-simplifier.md spec/state.yaml

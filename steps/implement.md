@@ -4,18 +4,18 @@ Walk the user through `## Implementation phases` one phase at a time: kick off i
 
 ## State machine
 
-**Allowed from phases:** `converged` · `verified` (re-run is harmless; useful if user adds/edits a phase post-verify)
-**Transitions to:** stays in current phase (does not move the main `phase` field)
+**Allowed from stages:** `converged` · `verified` (re-run is harmless; useful if user adds/edits a phase post-verify)
+**Transitions to:** stays in current stage (does not move the main `stage` field)
 
 State change: appends to `phases_implemented: [<int>]` in `state.yaml` once the user confirms a phase's per-phase verify is acceptable.
 
 **Re-run behavior:** Idempotent. Re-running on a phase already in `phases_implemented` reports "phase N already confirmed; next is phase N+1" and offers to re-audit if requested.
 
-Read `state.yaml` first; validate phase. Write `state.yaml` only when the user confirms a phase as done.
+Read `state.yaml` first; validate stage. Write `state.yaml` only when the user confirms a phase as done.
 
 ## Protocol
 
-1. **Check preconditions.** Read `state.yaml`; validate `phase` is `converged` or `verified`. If `revised` or earlier, tell the user the spec must be converged first and stop. If `closed`, refuse.
+1. **Check preconditions.** Read `state.yaml`; validate `stage` is `converged` or `verified`. If `revised` or earlier, tell the user the spec must be converged first and stop. If `closed`, refuse.
 
 2. **Parse phases.** Read `spec/spec.md`. Extract the `## Implementation phases` section. If absent, tell the user this iteration has no declared phases and they should run `/spec verify` directly when implementation is done; stop. If present but says "None — this iteration introduces no new implementation work.", same outcome.
 
@@ -179,6 +179,6 @@ Read `state.yaml` first; validate phase. Write `state.yaml` only when the user c
 
 ## Notes
 
-- This step deliberately does **not** transition `phase` in `state.yaml`. The main phase remains `converged` until `/spec verify` runs the full-spec audit and the user accepts. Per-phase audits are early-warning evidence, not substitutes for the final verification.
+- This step deliberately does **not** transition `stage` in `state.yaml`. The main stage remains `converged` until `/spec verify` runs the full-spec audit and the user accepts. Per-phase audits are early-warning evidence, not substitutes for the final verification.
 - If the user adds or removes phases in `spec.md` mid-implementation (e.g., a revise pass), the `phases_implemented` list may go stale. Detect by comparing `total` to `max(phases_implemented)`; if mismatched, warn and ask the user whether to clear the list and start over.
 - Skipping phases (`/spec implement 3` while `phases_implemented = []`) is allowed but warned — the no-forward-deps invariant is a guideline, not a lock.

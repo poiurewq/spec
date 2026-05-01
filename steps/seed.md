@@ -4,11 +4,11 @@ Summarize the latest interview transcript into `spec/spec.md`. Bounded transform
 
 ## State machine
 
-**Allowed from phases:** `interviewing` (after gate passes) · `seeded` (re-draft)
+**Allowed from stages:** `interviewing` (after gate passes) · `seeded` (re-draft)
 **Transitions to:** `seeded`
 **Re-run behavior:** Allowed. Warn user that current `spec.md` will be replaced.
 
-Read state.yaml first; validate phase. Write state.yaml on completion.
+Read state.yaml first; validate stage. Write state.yaml on completion.
 
 ## Protocol
 
@@ -56,7 +56,7 @@ Read state.yaml first; validate phase. Write state.yaml on completion.
 
 5. **User review.** Show the sub-agent's summary. Ask the user to open `spec/spec.md` and confirm, edit directly, or request revisions. Do not auto-accept.
 
-6. **Update state.yaml:** `phase: seeded`, `last_command: /spec seed`, `last_command_at: <timestamp>`. `spec_sha` updates after user commits.
+6. **Update state.yaml:** `stage: seeded`, `last_command: /spec seed`, `last_command_at: <timestamp>`. `spec_sha` updates after user commits.
 
 7. **Propose commit:**
    ```

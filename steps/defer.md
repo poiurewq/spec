@@ -6,9 +6,9 @@ Capture a feature request, bug report, or "we should do this someday" idea to `s
 
 ## State machine
 
-**Allowed from phases:** any.
+**Allowed from stages:** any.
 **Refused** only when `spec/` does not exist — tell the user: "No `spec/` directory exists yet. Run `/spec setup` first to onboard this project."
-**Transitions to:** unchanged. `/spec defer` never moves the phase machine.
+**Transitions to:** unchanged. `/spec defer` never moves the stage machine.
 **Re-run behavior:** always allowed.
 
 ## When this runs

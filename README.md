@@ -14,7 +14,7 @@ Force discipline at the input stage of software projects: surface assumptions, e
 
 - **Single entry point:** `/spec <subcommand>` — router in `SKILL.md`
 - **Artifacts under `./spec/`** in the user's project directory
-- **State tracked in `./spec/state.yaml`** — single source of truth for phase, iteration, mode
+- **State tracked in `./spec/state.yaml`** — single source of truth for stage, iteration, mode
 - **Sub-agents pinned to Opus** for seed drafting and persona reviews
 - **`Explore` subagent** for `/spec verify` codebase reading
 - **Plain text + git** — no databases, no hidden state
@@ -27,7 +27,7 @@ spec/
 ├── takeaway.md                          # appears after first /spec close
 ├── decisions.log                        # cross-iteration, append-only (past-tense)
 ├── deferred.md                          # cross-iteration backlog (future-tense, mutable)
-├── state.yaml                           # phase machine state (skill-writes only)
+├── state.yaml                           # stage machine state (skill-writes only)
 └── archive/                             # flat, v-prefixed; working + snapshots
     ├── v<NNN>-YYYY-MM-DD-HHMM-interview.md
     ├── v<NNN>-YYYY-MM-DD-HHMM-<persona>.md
@@ -40,7 +40,7 @@ spec/
 
 | Command | Purpose |
 |---|---|
-| `/spec` | Report current phase; suggest next command |
+| `/spec` | Report current stage; suggest next command |
 | `/spec setup` | First-run onboarding — configures permissions, orients the user, routes to interview/adopt. Idempotent; does **not** create state |
 | `/spec interview` | Socratic interview; clarity-gate before seed. Optional `--iteration N` on init |
 | `/spec adopt` | Bootstrap `spec/` for an existing brownfield project (with optional rough spec doc). Lands in `interviewing` with pre-populated context. Optional `--iteration N` |
@@ -50,7 +50,7 @@ spec/
 | `/spec check` | Convergence test (two consecutive wording-only revisions) |
 | `/spec implement` | Orchestrates per-phase implementation: kickoff prompt for a fresh session, then per-phase Explore audit on re-run. Does **not** implement code itself |
 | `/spec verify` | Explore subagent audits code against spec, renders evidence |
-| `/spec reconcile` | Pull post-converge code drift back into the spec — bidirectional ingestion. Four-bucket triage (decision-only / minor / structural / major) routes phase regression accordingly |
+| `/spec reconcile` | Pull post-converge code drift back into the spec — bidirectional ingestion. Four-bucket triage (decision-only / minor / structural / major) routes stage regression accordingly |
 | `/spec close` | Finalize iteration: resolve gaps, generate takeaway, archive |
 | `/spec decide` | Log a decision (explicit or auto-triggered mid-step) — past-tense |
 | `/spec defer` | Shelve a feature request, bug, or idea to `deferred.md` for triage at the next iteration's interview — future-tense backlog. Accepts batch invocation; `--resolve D-XXX drop` for housekeeping |
@@ -58,7 +58,7 @@ spec/
 
 ## State machine
 
-Six phases per iteration, linear except for the review↔revise↔check loop:
+Six stages per iteration, linear except for the review↔revise↔check loop:
 
 ```
   [no state.yaml]
@@ -83,7 +83,7 @@ Six phases per iteration, linear except for the review↔revise↔check loop:
                                                 converged ◄──┐
                                                      │       │ /spec implement (per-phase loop;
                                                      │       │  appends to phases_implemented,
-                                                     │       │  does not change phase)
+                                                     │       │  does not change stage)
                                                      │ ──────┘
                                                      │
                                                      │ /spec verify
@@ -105,7 +105,7 @@ Six phases per iteration, linear except for the review↔revise↔check loop:
 
 ### Command preconditions + transitions
 
-| Command | Allowed from phase(s) | Transitions to |
+| Command | Allowed from stage(s) | Transitions to |
 |---|---|---|
 | `/spec setup` | any (including no state) | unchanged (router; never creates state) |
 | `/spec interview` | (no state) · `closed` · `interviewing` (resume) | `interviewing` |
@@ -150,7 +150,7 @@ Why orchestration earns its keep even though implementation itself is low-ambigu
 schema_version: 1
 iteration: <int>                # 1 by default at init; user may override via --iteration N on /spec interview or /spec adopt; otherwise increments only on post-close interview
 mode: greenfield | iteration | adopted
-phase: <phase-name>
+stage: <stage-name>
 started_at: <ISO timestamp>     # when current iteration began
 last_command: <string>
 last_command_at: <ISO timestamp>
@@ -164,7 +164,7 @@ phases_implemented: [<int>]            # phase numbers user confirmed via /spec 
 Notes:
 - **Skill is the sole writer.** Users may read for inspection; do not hand-edit.
 - **If missing or malformed:** `/spec` bare offers to auto-reconstruct from archive/ filenames + `spec.md`/`takeaway.md` presence. Requires user confirmation before writing fresh state.yaml.
-- **No gap tracking in state.** Accepted GAP rationales live permanently in `takeaway.md`; state.yaml only drives phase transitions.
+- **No gap tracking in state.** Accepted GAP rationales live permanently in `takeaway.md`; state.yaml only drives stage transitions.
 
 ## Design philosophy
 

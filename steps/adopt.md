@@ -1,12 +1,12 @@
 # /spec adopt — Bootstrap spec/ for an existing project
 
-Initialize `spec/` for a project that already has code and (optionally) a rough specification document. Lands in phase `interviewing` with a session file pre-populated by an Explore sub-agent, so `/spec interview` resumes from synthesized context rather than a blank page.
+Initialize `spec/` for a project that already has code and (optionally) a rough specification document. Lands in stage `interviewing` with a session file pre-populated by an Explore sub-agent, so `/spec interview` resumes from synthesized context rather than a blank page.
 
 ## State machine
 
-**Allowed from phases:** `[no state.yaml]` **only**. Pure bootstrap command.
+**Allowed from stages:** `[no state.yaml]` **only**. Pure bootstrap command.
 **Transitions to:** `interviewing` (mode `adopted`).
-**Re-run behavior:** **Refused** if `spec/state.yaml` exists. Tell the user: "Adopt is a bootstrap command. Found existing `spec/state.yaml` (phase: <phase>). Use `/spec` to see the current state, or `/spec interview` if you're ready to start the next iteration."
+**Re-run behavior:** **Refused** if `spec/state.yaml` exists. Tell the user: "Adopt is a bootstrap command. Found existing `spec/state.yaml` (stage: <stage>). Use `/spec` to see the current state, or `/spec interview` if you're ready to start the next iteration."
 
 **Not** surfaced by the `/spec` bare auto-reconstruction path — adoption is a pre-first-use step, distinct from recovering a partially-built `spec/`.
 
@@ -98,7 +98,7 @@ Initialize `spec/` for a project that already has code and (optionally) a rough 
    >
    > Keep `[from-code]` factual and file-referenced — no interpretation. Keep `[from-rough-spec]` as *claims*, explicitly not verified. Surface every tension you notice in the Ambiguities section; these are the highest-value questions for the human interview.
    >
-   > Do **not** draft acceptance criteria. Do **not** write `spec/spec.md`. The seed phase happens later.
+   > Do **not** draft acceptance criteria. Do **not** write `spec/spec.md`. The seed stage happens later.
    >
    > Attempt to append to the session file (use Edit or Write on the absolute path). If the tool is denied, retry once; if still denied, include the full intended appended content verbatim in your final reply inside a fenced code block labeled with the absolute target path, so the parent session can append it. Never report success without either having appended the content or having dumped it.
    >
@@ -112,7 +112,7 @@ Initialize `spec/` for a project that already has code and (optionally) a rough 
    schema_version: 1
    iteration: <n>
    mode: adopted
-   phase: interviewing
+   stage: interviewing
    started_at: <ISO timestamp>
    last_command: /spec adopt
    last_command_at: <ISO timestamp>
@@ -124,7 +124,7 @@ Initialize `spec/` for a project that already has code and (optionally) a rough 
 
 9. **Present the sub-agent's summary** to the user and tell them:
 
-   > Adoption complete. Phase is `interviewing` (mode: adopted, iteration <n>). The session file at `spec/archive/<session-filename>` has been pre-populated with synthesized context.
+   > Adoption complete. Stage is `interviewing` (mode: adopted, iteration <n>). The session file at `spec/archive/<session-filename>` has been pre-populated with synthesized context.
    >
    > **Next:** start a new conversation and run `/spec interview` to ratify this context, answer the outstanding ambiguities, and pass the clarity gate before `/spec seed`.
 

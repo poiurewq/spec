@@ -4,8 +4,8 @@ The canonical first command a new user runs. Configures `.claude/` permissions, 
 
 ## State machine
 
-**Allowed from phases:** any, including `[no state.yaml]`.
-**Transitions to:** unchanged. Setup never moves the phase machine — it delegates state creation to `/spec interview` or `/spec adopt`.
+**Allowed from stages:** any, including `[no state.yaml]`.
+**Transitions to:** unchanged. Setup never moves the stage machine — it delegates state creation to `/spec interview` or `/spec adopt`.
 **Re-run behavior:** Idempotent. Permissions config is safe to re-apply. Orientation is suppressed when `spec/state.yaml` already exists.
 
 Setup is **not required** — `/spec interview` and `/spec adopt` work without it. The permissions config is a convenience.
@@ -20,7 +20,7 @@ Setup is **not required** — `/spec interview` and `/spec adopt` work without i
    - Record whether either entry was added (vs already present) — used in the report later.
 
 2. **Detect onboarding state.**
-   - **`spec/state.yaml` exists** → already onboarded. Read it; capture `iteration`, `mode`, `phase`. Skip to step 6 (re-run report).
+   - **`spec/state.yaml` exists** → already onboarded. Read it; capture `iteration`, `mode`, `stage`. Skip to step 6 (re-run report).
    - **`spec/` exists with artifacts but no `state.yaml`** → corrupted/manual. Skip to step 6 (corruption report).
    - **Otherwise** → fresh onboarding. Continue to step 3.
 
@@ -70,7 +70,7 @@ Setup is **not required** — `/spec interview` and `/spec adopt` work without i
      - "Run `/spec interview` in a fresh conversation to start." (greenfield)
      - "Run `/spec adopt` in a fresh conversation to start." (brownfield)
      - "OK, stopping here. Run `/spec setup` again when you're ready, or `/spec help` for the full reference." (skipped)
-   - **Already onboarded (`state.yaml` exists):** print exactly one line: `Already set up: iteration <n>, mode <mode>, phase <phase>. Run /spec (bare) for the next-step suggestion.` Plus the permissions delta line if anything changed. **Do not print the orientation blurb.**
+   - **Already onboarded (`state.yaml` exists):** print exactly one line: `Already set up: iteration <n>, mode <mode>, stage <stage>. Run /spec (bare) for the next-step suggestion.` Plus the permissions delta line if anything changed. **Do not print the orientation blurb.**
    - **Corruption (artifacts but no `state.yaml`):** print: "Found `spec/` artifacts but no `state.yaml`. Run `/spec` (bare) — it has an auto-reconstruction path." Plus permissions delta line.
 
 7. **Propose commit (only if `.claude/settings.json` actually changed).** If permission entries were added (not just confirmed), propose:
