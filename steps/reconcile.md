@@ -94,7 +94,23 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
 
 4. **Match against deferred items.** If `spec/deferred.md` exists and contains items, for each drift item check whether it could be a *promotion* of an existing deferred item — i.e., the code now implements something the user previously shelved. The skill **suggests** matches by comparing drift descriptions to deferred-item titles and descriptions; the user confirms or denies each suggested match. This is suggestion-only — never auto-link. Carry confirmed matches forward to step 5 as `→ promotes D-XXX` annotations on the relevant drift items.
 
-5. **Turn 1 — Present drift items with suggested buckets.** Show the user a numbered list of drift items (regardless of source). For each item, suggest a bucket with one-line rationale. Annotate any item carrying a confirmed match from step 4 with `→ promotes D-XXX`. **Do not classify silently — the user makes the final call.** The five buckets:
+5. **Turn 1 — Present drift items with suggested buckets.** Open with the bucket legend (always — do not skip, even for repeat users), then show the numbered drift items. For each item, suggest a bucket with one-line rationale. Annotate any item carrying a confirmed match from step 4 with `→ promotes D-XXX`. **Do not classify silently — the user makes the final call.**
+
+   **Bucket legend to present to the user (verbatim, at the top of Turn 1):**
+
+   > **Reconcile buckets** — each drift item gets assigned to one:
+   >
+   > | # | Name | What it does | Phase impact |
+   > |---|------|-------------|--------------|
+   > | 1 | **Decision-only** | Log to `decisions.log`; `spec.md` untouched | None |
+   > | 2 | **Minor spec edit** | Edit `spec.md` (clarify wording, add `[adopted]` AC, add unstated-but-true invariant); no existing assertion changes | None |
+   > | 3 | **Structural spec edit** | Edit `spec.md` (change an assertion, add/remove/split/merge ACs, modify invariant); forces `/spec check` | Drops to `revised` |
+   > | 4 | **Major / contested** | Edit `spec.md` for scope-level changes or cascading impact; forces a fresh persona review | Drops to `in-review` |
+   > | 5 | **Defer** | Append to `spec/deferred.md`; `spec.md` untouched | None |
+   >
+   > Reply `reject` for any item that isn't real drift.
+
+   The five buckets (for Claude's suggestion heuristics):
 
    1. **Decision-only** — append to `decisions.log` via `/spec decide`'s entry format; `spec.md` untouched. Phase unchanged.
       *Suggest when:* the drift is a non-load-bearing implementation choice (library/algorithm pick, naming, internal refactor) that no AC or invariant constrains.
@@ -109,7 +125,7 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
 
    **Promotion interaction (cross-cuts buckets 2–4).** A bucket-2/3/4 item annotated `→ promotes D-XXX` will additionally remove `D-XXX` from `spec/deferred.md` and write a one-line `decisions.log` entry recording the promotion (handled in step 7).
 
-   End the turn with:
+   End the turn (after the item list) with:
 
    > For each drift item, tell me:
    > - The bucket you want (1/2/3/4/5), or `reject` if it isn't real drift.
