@@ -26,7 +26,7 @@ Human-driven, agent-assisted spec-development: Socratic interview gated by a sel
 | Input | Action |
 |---|---|
 | `/spec` (bare) | Detect state and report (procedure below) |
-| `/spec setup` | Read `steps/setup.md` |
+| `/spec setup` | Read `steps/setup.md` (first-run onboarding — permissions + orientation + route to interview/adopt) |
 | `/spec interview` (optional `--iteration N`) | Read `steps/interview.md` |
 | `/spec adopt` (optional `--iteration N`) | Read `steps/adopt.md` |
 | `/spec seed` | Read `steps/seed.md` |
@@ -84,7 +84,7 @@ phases_implemented: [<int>]              # phase numbers user confirmed via /spe
    - Suggest next command per the phase mapping below.
 
 2. **If `spec/state.yaml` is missing:**
-   - **Empty / missing `spec/`** → suggest `/spec interview` (greenfield) for a new project, or `/spec adopt` if the user has an existing codebase (and optionally a rough spec doc) they want to bring under the skill's care.
+   - **Empty / missing `spec/`** → suggest `/spec setup` as the canonical onramp (it orients the user and routes to greenfield or brownfield). Direct alternatives — `/spec interview` (greenfield) or `/spec adopt` (brownfield) — also work for users who know what they want.
    - **`spec/` exists with artifacts** → attempt auto-reconstruction:
      a. Scan `spec/archive/` for the highest `v<n>` prefix seen.
      b. Check presence of `spec.md`, `takeaway.md`, latest verify report.

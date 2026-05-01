@@ -28,6 +28,7 @@ Most AI-assisted development fails at the input stage. `/spec` gives you a disci
 | Command | What it does |
 |---|---|
 | `/spec` | Report phase; suggest next command |
+| `/spec setup` | First-run onboarding — configures permissions, orients you, routes to `/spec interview` (greenfield) or `/spec adopt` (brownfield) |
 | `/spec interview` | Conduct the Socratic interview (optional `--iteration N` at init) |
 | `/spec adopt` | Bootstrap `spec/` for an existing brownfield project with code + optional rough spec doc (optional `--iteration N`) |
 | `/spec seed` | Draft or revise `spec.md` from interview |
@@ -41,11 +42,16 @@ Most AI-assisted development fails at the input stage. `/spec` gives you a disci
 | `/spec decide "<text>"` | Log a decision |
 | `/spec help` | This help |
 
+### First time using `/spec` in a repo?
+
+Run `/spec setup` at the repo root. It configures permissions, orients you, and routes you to the right starting command.
+
 ### Example workflow — greenfield
 
 Each line is a **fresh conversation**.
 
 ```
+/spec setup                    # one-time; routes you to /spec interview
 /spec interview "Build a CLI tool that converts Markdown tables to CSV"
 /spec seed
 /spec review
@@ -61,6 +67,7 @@ Each line is a **fresh conversation**.
 One-shot bootstrap, then the normal loop. The adoption iteration (iteration 1 by default, or set via `--iteration N`) is mostly about converting claims to verified facts via `/spec verify`.
 
 ```
+/spec setup                    # one-time; routes you to /spec adopt
 /spec adopt                    # asks for rough spec doc path + optional focus paths; Explore sub-agent ingests
 /spec interview                # resumes the pre-populated session file; ratify, correct, pass clarity gate
 /spec seed                     # drafts spec.md from iteration template; ACs tagged [adopted] (claim) / [delta] / [regression]

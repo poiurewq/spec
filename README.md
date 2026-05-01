@@ -2,6 +2,10 @@
 
 A human-driven, agent-assisted spec-development workflow: Socratic interview, MECE acceptance criteria, three parallel skeptical review personas, convergence-by-judgment, evidence-based post-implementation audit, and explicit iteration closure with takeaway generation. Supports three modes: **greenfield** (new project), **iteration** (continuing a prior closed iteration), and **adopted** (existing brownfield project with code and optionally a rough spec doc being brought under the skill's care for the first time).
 
+## Getting started
+
+Run `/spec setup` at the root of your repo. It configures permissions, prints a short orientation, and routes you to `/spec interview` (greenfield) or `/spec adopt` (brownfield) — no need to read this whole document first.
+
 ## Purpose
 
 Force discipline at the input stage of software projects: surface assumptions, enumerate alternatives at every decision, catch drift via rotating review personas, and stop iterating when the spec has stabilized. Produce a trustworthy specification before writing code.
@@ -36,6 +40,7 @@ spec/
 | Command | Purpose |
 |---|---|
 | `/spec` | Report current phase; suggest next command |
+| `/spec setup` | First-run onboarding — configures permissions, orients the user, routes to interview/adopt. Idempotent; does **not** create state |
 | `/spec interview` | Socratic interview; clarity-gate before seed. Optional `--iteration N` on init |
 | `/spec adopt` | Bootstrap `spec/` for an existing brownfield project (with optional rough spec doc). Lands in `interviewing` with pre-populated context. Optional `--iteration N` |
 | `/spec seed` | Draft or revise `spec.md` from interview |
@@ -100,6 +105,7 @@ Six phases per iteration, linear except for the review↔revise↔check loop:
 
 | Command | Allowed from phase(s) | Transitions to |
 |---|---|---|
+| `/spec setup` | any (including no state) | unchanged (router; never creates state) |
 | `/spec interview` | (no state) · `closed` · `interviewing` (resume) | `interviewing` |
 | `/spec adopt` | (no state) **only** | `interviewing` (mode `adopted`) |
 | `/spec seed` | `interviewing` (post-gate) · `seeded` (re-draft) | `seeded` |
