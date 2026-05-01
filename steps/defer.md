@@ -107,7 +107,13 @@ For housekeeping outside an interview — drop a deferred item the user no longe
 
 When another step's dialogue reveals an item that should be shelved (user says "not this iteration, maybe later" or similar):
 
-1. Compute next ID and append to `spec/deferred.md` per Capture mode steps 3–5, with source set per the calling step (e.g., `via /spec reconcile bucket: defer`, `via /spec close gap resolution`, `via /spec interview triage`).
+1. **If `spec/deferred.md` does not exist, create it first** with the standard header:
+   ```markdown
+   # Deferred items
+
+   _Backlog of feature requests, bug reports, and ideas not yet committed to any iteration. Triaged at each iteration's interview._
+   ```
+   Then compute next ID and append to `spec/deferred.md` per Capture mode steps 3–5, with source set per the calling step (e.g., `via /spec reconcile bucket: defer`, `via /spec close gap resolution`, `via /spec interview triage`).
 
 2. Emit one-line mention to the user: "Deferred: <title> (D-XXX)."
 
