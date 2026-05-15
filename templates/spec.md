@@ -37,9 +37,11 @@
 
 ## Implementation phases
 
-> Ordered phases for building this. **Invariant:** phase N must be implementable to completion without any work from phase N+1 or later — dependencies flow only backward (later phases may depend on earlier ones, never the reverse). The implementer can work strictly in numerical order.
+> Ordered phases for building this. **Invariant:** phase N must be implementable to completion without any work from phase N+1 or later — dependencies flow only backward (later phases may depend on earlier ones, never the reverse). The numbering is a valid topological order; it is *not* a mandate to work serially.
 >
-> Each phase references AC IDs from the tree above. ACs may be split across phases at the leaf level if a parent AC has independently shippable sub-criteria. Every leaf AC must appear in exactly one phase. If the work is genuinely one coherent unit, use a single phase rather than inventing splits.
+> `**Depends on:**` edges are the source of truth for ordering. `**Parallelizable with:**` is the read-off: two phases are parallelizable when neither transitively depends on the other, and a phase that has any such sibling carries this line so the implementer (or multiple implementers) can see what may proceed concurrently without re-deriving it. Omit the line for phases with no independent sibling.
+>
+> Each phase references AC IDs from the tree above. ACs may be split across phases at the leaf level if a parent AC has independently shippable sub-criteria. Every leaf AC must appear in exactly one phase. If the work is genuinely one coherent unit, use a single phase rather than inventing splits — never manufacture parallelism by splitting a coherent unit.
 
 ### Phase 1. <short name>
 **Delivers:** <what works at the end of this phase, in one line>
@@ -50,6 +52,7 @@
 ### Phase 2. <short name>
 **Delivers:** <…>
 **Depends on:** Phase 1 (<short purpose phrase, e.g., "research-gate decisions">)
+**Parallelizable with:** Phase 3 (<short purpose phrase>) — omit this line if no sibling phase is independent of this one.
 - AC1.2
 
 ## Open questions
