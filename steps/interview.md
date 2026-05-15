@@ -150,9 +150,13 @@ When coverage is sufficient (or after ~12 questions, whichever first), read and 
 
 - **Any "no":** one more targeted question on that axis, then re-present the gate.
 - **All "yes":**
-  1. Append `## Conclusion` to the session file summarizing each axis in the user's own phrasing.
+  1. Append a `## Seed handoff` section to the session file. This is the durable carrier of interview nuance into `/spec seed` — which drafts in its own fresh session reading only this file from disk, never this conversation — so anything not written here is lost to seed. In the user's own phrasing:
+     - **Axis summary** — one or two sentences per axis: Goal, Constraints, Success criteria, Scope boundary (plus Motivation, Current state, Change delta, Invariants in iteration & adopted modes).
+     - **Emphasis** — what the user stressed or returned to; relative priorities they signaled but that aren't obvious from the axis summary alone.
+     - **Ruled-out interpretations** — readings the user explicitly rejected and why (easy to lose; cross-reference any `decisions.log` entries logged during this interview).
+     - **Open tensions** — unresolved trade-offs or items the user flagged as uncertain, so seed routes them to `## Open questions` rather than silently picking.
   2. Update state.yaml: `latest_interview` set, `stage` remains `interviewing` (transitions to `seeded` only when `/spec seed` runs).
-  3. Tell the user: "Interview complete. Start a new conversation and run `/spec seed` to draft the spec."
+  3. Tell the user: "Interview complete. Start a new conversation and run `/spec seed` — it drafts the spec interactively from this interview's `## Seed handoff`. Drafting is a generative step you can steer, so it gets its own fresh session."
   4. Propose (optional):
      ```
      git add spec/archive/<file>.md spec/state.yaml

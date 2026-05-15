@@ -1,6 +1,6 @@
 # /spec seed — Draft or revise the Seed
 
-Summarize the latest interview transcript into `spec/spec.md`. Bounded transform — run as an Opus sub-agent.
+Summarize the latest interview transcript into `spec/spec.md`. A generative step with real judgment calls (AC structuring, phase ordering) — run **in-conversation in a fresh session**, not as a sub-agent, so the user can steer at forks. A fresh session still reads only the interview file and template from disk, so resume-ability and the transcript-completeness forcing function are preserved.
 
 ## State machine
 
@@ -17,13 +17,13 @@ Read state.yaml first; validate stage. Write state.yaml on completion.
 2. **Pick template based on mode** (from state.yaml). Paths are relative to the skill base directory (announced at skill invocation):
    - `mode: greenfield` → `templates/spec.md`
    - `mode: iteration` → `templates/spec-iteration.md`
-   - `mode: adopted` → `templates/spec-iteration.md` (same template; tagging rules differ — see sub-agent prompt below)
+   - `mode: adopted` → `templates/spec-iteration.md` (same template; tagging rules differ — see step 3)
 
-   Resolve to an absolute path by prefixing the skill base directory when passing to the sub-agent (sub-agents do not inherit the skill's working context).
+   Resolve to an absolute path by prefixing the skill base directory.
 
-3. **Spawn drafting sub-agent.** Use the Agent tool with `subagent_type: "general-purpose"` and `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7** (dump full file content on Write denial). Prompt:
+3. **Draft the spec (you, in this conversation).** Working directly in this fresh session, produce the spec per the requirements below. Because this is in-conversation, at a genuine fork — multiple reasonable AC structurings, or multiple valid phase orderings — surface the alternatives to the user and let them pick rather than silently choosing; fall back to pick-and-log only if the user defers the choice back to you. The requirements:
 
-   > Read the interview file at `spec/archive/<latest_interview-from-state.yaml>`. If `spec/spec.md` already exists, also read it. If mode is iteration and `spec/takeaway.md` exists, also read it (as "prior iteration shipped state").
+   > Read the interview file at `spec/archive/<latest_interview-from-state.yaml>`. It ends with a `## Seed handoff` section — the interviewer's distilled intent (axis summary, emphasis, ruled-out interpretations, open tensions). Weight it heavily; route its "Open tensions" into `## Open questions`, and do not re-introduce any "Ruled-out interpretations". If `spec/spec.md` already exists, also read it. If mode is iteration and `spec/takeaway.md` exists, also read it (as "prior iteration shipped state").
    >
    > Produce a new `spec/spec.md` using the template at `<template-path-from-step-2>`.
    >
@@ -48,20 +48,16 @@ Read state.yaml first; validate stage. Write state.yaml on completion.
    > - When multiple reasonable AC structurings exist, pick one; append losers to `spec/decisions.log` with one-line rationale each.
    > - Do not invent requirements the interview did not surface. Missing info → flag at top under `## Open questions`.
    >
-   > Write `spec/spec.md` (use the absolute path). Attempt the Write tool; if denied, retry once; if still denied, include the full intended file content verbatim in your final reply inside a fenced code block labeled with the absolute target path, so the parent session can write it. Never report success without either having written the file or having dumped its full content.
-   >
-   > Report back: path, 3-line summary of changes (or "initial draft"), open questions, and (if Write was denied) the full content dump.
+   > Write `spec/spec.md` (use the absolute path) with the Write tool. If Write is denied, ask the user to grant it — do not silently drop the draft.
 
-4. **Verify the file exists.** After the sub-agent returns, check whether `spec/spec.md` was actually written. If not, extract the dumped content from the sub-agent's reply and write it directly using the Write tool in the parent session.
+4. **User review.** State the path, a 3-line summary of changes (or "initial draft"), and any open questions. Ask the user to open `spec/spec.md` and confirm, edit directly, or request revisions. Do not auto-accept.
 
-5. **User review.** Show the sub-agent's summary. Ask the user to open `spec/spec.md` and confirm, edit directly, or request revisions. Do not auto-accept.
+5. **Update state.yaml:** `stage: seeded`, `last_command: /spec seed`, `last_command_at: <timestamp>`. `spec_sha` updates after user commits.
 
-6. **Update state.yaml:** `stage: seeded`, `last_command: /spec seed`, `last_command_at: <timestamp>`. `spec_sha` updates after user commits.
-
-7. **Propose commit:**
+6. **Propose commit:**
    ```
    git add spec/spec.md spec/decisions.log spec/state.yaml
    git commit -m "spec: <initial draft | re-draft from interview v<n>>"
    ```
 
-8. **Next step.** Tell user to run `/spec review` in a new conversation.
+7. **Next step.** Tell user to run `/spec review` in a new conversation.
