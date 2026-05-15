@@ -15,7 +15,7 @@ Most AI-assisted development fails at the input stage. `/spec` gives you a disci
 ### Core loop
 
 1. **Interview** — Socratic dialogue to clarify intent. Pass the self-rated clarity gate.
-2. **Seed** — an Opus sub-agent drafts `spec/spec.md` from the interview transcript.
+2. **Seed** — in a fresh conversation you draft `spec/spec.md` from the interview transcript (steerable; not a sub-agent).
 3. **Review** — three skeptical personas (Ontologist, Contrarian, Simplifier) critique in parallel.
 4. **Revise** — you address each critique in conversation; the agent proposes the revision.
 5. **Check** — declare convergence when two consecutive revisions changed only wording.

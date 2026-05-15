@@ -15,7 +15,7 @@ Force discipline at the input stage of software projects: surface assumptions, e
 - **Single entry point:** `/spec <subcommand>` — router in `SKILL.md`
 - **Artifacts under `./spec/`** in the user's project directory
 - **State tracked in `./spec/state.yaml`** — single source of truth for stage, iteration, mode
-- **Sub-agents pinned to Opus** for seed drafting and persona reviews
+- **Seed drafts in-conversation** in a fresh, steerable session; persona reviews run as Sonnet sub-agents
 - **`Explore` subagent** for `/spec verify` codebase reading
 - **Plain text + git** — no databases, no hidden state
 
@@ -45,7 +45,7 @@ spec/
 | `/spec interview` | Socratic interview; clarity-gate before seed. Optional `--iteration N` on init |
 | `/spec adopt` | Bootstrap `spec/` for an existing brownfield project (with optional rough spec doc). Lands in `interviewing` with pre-populated context. Optional `--iteration N` |
 | `/spec seed` | Draft or revise `spec.md` from interview |
-| `/spec review` | Three parallel Opus personas critique the spec |
+| `/spec review` | Three parallel Sonnet personas critique the spec |
 | `/spec revise` | Three-turn: summarize → user addresses → propose revision |
 | `/spec check` | Convergence test (two consecutive wording-only revisions) |
 | `/spec implement` | Orchestrates per-phase implementation: kickoff prompt for a fresh session, then per-phase Explore audit on re-run. Does **not** implement code itself |

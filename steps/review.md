@@ -1,6 +1,6 @@
 # /spec review — Three-persona review
 
-Three skeptical review passes against the current `spec/spec.md`. Each persona runs as a parallel Opus sub-agent.
+Three skeptical review passes against the current `spec/spec.md`. Each persona runs as a parallel Sonnet sub-agent.
 
 ## State machine
 
