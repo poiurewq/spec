@@ -30,6 +30,7 @@ Read state.yaml first; validate stage. Write state.yaml after Turn 3.
 
 User responds per concern. During dialogue:
 - For any "unsure" item, apply **condensed diamond** — enumerate ≥3 ways to address the critique with tradeoffs before helping the user converge.
+- When a resolution implies a **structural choice** in `spec.md` — splitting vs. merging an AC, where a new section/subsection lands, an AC-renumbering scheme — raise that fork *here*, in dialogue: enumerate the options with tradeoffs and let the user pick. Do not defer it silently to Turn 3. The goal is that Turn 3 *transcribes* already-decided structure rather than inventing it.
 - Log significant decisions to `spec/decisions.log` per `steps/decide.md` (under the current iteration's header).
 - Do **not** propose a revised `spec.md` yet. Wait until the user signals all concerns are addressed or explicitly deferred.
 
@@ -39,9 +40,9 @@ Only after the user signals done:
 
 1. Produce the revision. Choose format by change size:
    - **Small changes** (a handful of line edits, 1–2 AC tweaks) → show a unified diff inline and wait for approval before writing.
-   - **Large / structural** (section rewrites, AC renumbering, multiple subsections touched) → call `Write` on `spec/spec.md` directly. Do **not** dump the full rewritten file into the chat transcript first — the tool's permission prompt already surfaces the full new content to the user for approval, and duplicating it inline wastes tokens on large files. In the message accompanying the `Write` call, summarize the changes at a high level (what sections moved, what was added/removed, MECE re-check result) so the user can skim before approving the write. If the user denies the write, adjust and retry.
+   - **Large / structural** (section rewrites, AC renumbering, multiple subsections touched) → **first present a short structural outline and wait for a go-ahead**: sections touched, the AC-renumbering map (old → new), where any new sections/subsections land, and the MECE re-check result. Keep it a plan, not the rewritten file — do **not** dump the full new `spec.md` into chat (the `Write` permission prompt already surfaces full content for approval; duplicating it inline wastes tokens on large files). On go-ahead, call `Write` on `spec/spec.md` directly; the message accompanying the `Write` call restates the outline at a high level so the user can skim before approving the write itself. If the user steers at the outline, or denies the write, adjust and re-present the outline.
 
-2. **MECE re-check.** Verify AC tree is still mutually exclusive + collectively exhaustive after changes. In iteration mode, also verify delta/regression tags are still correct. Do this *before* calling `Write` (or showing the diff) — never after.
+2. **MECE re-check.** Verify AC tree is still mutually exclusive + collectively exhaustive after changes. In iteration mode, also verify delta/regression tags are still correct. Do this *before* calling `Write` (or showing the diff, or presenting the structural outline) — never after.
 
 3. After `spec/spec.md` is written (whether via direct `Write` or post-diff approval), proceed to step 4.
 
