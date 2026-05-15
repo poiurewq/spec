@@ -76,9 +76,11 @@
 
 > Ordered phases for the **`[delta]` work in this iteration**. `[regression]` and `[adopted]` ACs are not phased here — they are verification targets for `/spec verify`, not implementation work.
 >
-> **Invariant:** phase N must be implementable to completion without any work from phase N+1 or later — dependencies flow only backward. The implementer can work strictly in numerical order.
+> **Invariant:** phase N must be implementable to completion without any work from phase N+1 or later — dependencies flow only backward. The numbering is a valid topological order; it is *not* a mandate to work serially.
 >
-> Each phase references `[delta]` AC IDs from the tree above. Every `[delta]` leaf must appear in exactly one phase. If the iteration's delta is one coherent unit, use a single phase rather than inventing splits. If this iteration has no `[delta]` ACs (pure adoption ratification with no code changes), write "None — this iteration introduces no new implementation work." and omit the phase headings.
+> `**Depends on:**` edges are the source of truth for ordering. `**Parallelizable with:**` is the read-off: two phases are parallelizable when neither transitively depends on the other, and a phase that has any such sibling carries this line so the implementer can see what may proceed concurrently. Omit the line for phases with no independent sibling.
+>
+> Each phase references `[delta]` AC IDs from the tree above. Every `[delta]` leaf must appear in exactly one phase. If the iteration's delta is one coherent unit, use a single phase rather than inventing splits — never manufacture parallelism by splitting a coherent unit. If this iteration has no `[delta]` ACs (pure adoption ratification with no code changes), write "None — this iteration introduces no new implementation work." and omit the phase headings.
 
 ### Phase 1. <short name>
 **Delivers:** <what works at the end of this phase, in one line>
@@ -89,6 +91,7 @@
 ### Phase 2. <short name>
 **Delivers:** <…>
 **Depends on:** Phase 1 (<short purpose phrase, e.g., "research-gate decisions">)
+**Parallelizable with:** Phase 3 (<short purpose phrase>) — omit this line if no sibling phase is independent of this one.
 - AC2.1   _(if AC2 is `[delta]`; skip `[regression]`/`[adopted]` ACs)_
 
 ## Open questions
