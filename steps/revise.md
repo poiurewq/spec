@@ -31,7 +31,7 @@ Read state.yaml first; validate stage. Write state.yaml after Turn 3.
 User responds per concern. During dialogue:
 - For any "unsure" item, apply **condensed diamond** — enumerate ≥3 ways to address the critique with tradeoffs before helping the user converge.
 - When a resolution implies a **structural choice** in `spec.md` — splitting vs. merging an AC, where a new section/subsection lands, an AC-renumbering scheme — raise that fork *here*, in dialogue: enumerate the options with tradeoffs and let the user pick. Do not defer it silently to Turn 3. The goal is that Turn 3 *transcribes* already-decided structure rather than inventing it.
-- Log significant decisions to `spec/decisions.log` per `steps/decide.md` (under the current iteration's header).
+- When the user makes a non-obvious choice (accepting a critique with a substantive reason, rejecting one with reasoning, picking an AC-renumbering scheme), propose a `spec/decisions.log` entry via `steps/decide.md`'s auto-invocation protocol — every proposal must traverse the mandatory Consent gate, never append silently. Batch the proposals at the end of Turn 2 (one consolidated list) rather than after every critique. Rationale must come from the user's own words; if a choice was made without an articulated reason and you think it might be worth logging, ask the user for the reason before proposing the entry. Routine "accept the wording fix" or "reject — already covered" responses are usually not decision-worthy; do not propose entries for them.
 - Do **not** propose a revised `spec.md` yet. Wait until the user signals all concerns are addressed or explicitly deferred.
 
 ## Turn 3 — Propose the revision

@@ -52,7 +52,7 @@ spec/
 | `/spec verify` | Explore subagent audits code against spec, renders evidence |
 | `/spec reconcile` | Pull post-converge code drift back into the spec — bidirectional ingestion. Four-bucket triage (decision-only / minor / structural / major) routes stage regression accordingly |
 | `/spec close` | Finalize iteration: resolve gaps, generate takeaway, archive |
-| `/spec decide` | Log a decision (explicit or auto-triggered mid-step) — past-tense |
+| `/spec decide` | Log a decision (explicit or proposed mid-step under a mandatory user-consent gate) — past-tense; never auto-written without confirmation |
 | `/spec defer` | Shelve a feature request, bug, or idea to `deferred.md` for triage at the next iteration's interview — future-tense backlog. Accepts batch invocation; `--resolve D-XXX drop` for housekeeping |
 | `/spec help` | Print user-facing help |
 
@@ -174,6 +174,8 @@ Notes:
 - **MECE enforced at two gates:** seed drafting and revise Turn 3.
 - **Condensed diamond** (≥3 alternatives at non-trivial decisions) is a cross-cutting norm, applied in interview, seed, and revise.
 - **One conversation per step.** Context stays bounded; each session serves one purpose.
+- **`decisions.log` is gated, not auto-filled.** Every append — even operational markers like "Spec converged" and "Iteration closed" — is presented to the user as a proposed entry first and only written on explicit confirmation. The append-only file fills up fast, and the gate is the only thing that keeps it usefully short. Deferred-item capture (`deferred.md`, mutable) intentionally has no gate — over-capture there is cheap.
+- **No fabricated rationale.** When recording *why* (a decision's `Rationale:` line, a spec's `Motivation`, an accepted-gap reason), the skill uses only reasons the user actually surfaced. Tightening or paraphrasing is fine; inventing plausible-sounding reasons from the shape of the artifact is not. When a user-supplied reason is thin or missing on a load-bearing field, the skill prompts the user rather than confabulating.
 
 ## Distilled from Ouroboros
 

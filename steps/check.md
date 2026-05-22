@@ -33,9 +33,9 @@ Read state.yaml first; validate stage. Write state.yaml if convergence is declar
    - Structural → one more review/revise cycle, then re-check. Stage stays `revised`.
 
 7. **On convergence:**
-   - Append decisions.log entry via `steps/decide.md`: title `Spec converged`, decision `Converged at <short-SHA> on <YYYY-MM-DD>`, rationale `Two consecutive wording-only revisions`.
+   - Propose a `decisions.log` entry via `steps/decide.md`'s auto-invocation protocol (mandatory Consent gate): title `Spec converged`, decision `Converged at <short-SHA> on <YYYY-MM-DD>.`, rationale `Two consecutive wording-only revisions per /spec check.` (this is a true operational reason, not invented — the gate criterion *is* the rationale; do not add embellishment about why convergence matters). Alternatives: omit. The user may decline the gate; if so, the stage still transitions to `converged` — only the log entry is skipped, and drop `spec/decisions.log` from the proposed `git add` line below.
    - Update state.yaml: `stage: converged`, `last_command: /spec check`, `last_command_at`.
-   - Propose:
+   - Propose (drop `spec/decisions.log` from the `git add` if the user skipped the gate):
      ```
      git add spec/decisions.log spec/state.yaml
      git commit -m "spec: converged at <short-SHA>"

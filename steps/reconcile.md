@@ -112,7 +112,7 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
 
    The five buckets (for Claude's suggestion heuristics):
 
-   1. **Decision-only** — append to `decisions.log` via `/spec decide`'s entry format; `spec.md` untouched. Stage unchanged.
+   1. **Decision-only** — propose an entry for `decisions.log` via `/spec decide`'s auto-invocation protocol (mandatory Consent gate; user may decline); `spec.md` untouched. Stage unchanged.
       *Suggest when:* the drift is a non-load-bearing implementation choice (library/algorithm pick, naming, internal refactor) that no AC or invariant constrains.
    2. **Minor spec edit** — direct edit to `spec.md`. MECE re-check. Stage unchanged. May include adding `[adopted]`-tagged ACs to record de-facto behavior, clarifying wording without changing assertion, or adding an obviously-true unstated invariant.
       *Suggest when:* the spec needs to absorb the reality but no existing AC's *assertion* changes and no AC is removed.
@@ -123,7 +123,7 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
    5. **Defer** — append to `spec/deferred.md` via `steps/defer.md`'s automatic-invocation pattern; `spec.md` untouched. Stage unchanged.
       *Suggest when:* the drift is real but the user judges it shouldn't be ratified into this iteration's spec — it's a future-iteration concern. Use this when the spec change would require iteration-level rethinking that the user wants to defer rather than handle now.
 
-   **Promotion interaction (cross-cuts buckets 2–4).** A bucket-2/3/4 item annotated `→ promotes D-XXX` will additionally remove `D-XXX` from `spec/deferred.md` and write a one-line `decisions.log` entry recording the promotion (handled in step 7).
+   **Promotion interaction (cross-cuts buckets 2–4).** A bucket-2/3/4 item annotated `→ promotes D-XXX` will additionally remove `D-XXX` from `spec/deferred.md` and propose a one-line `decisions.log` entry recording the promotion (handled in step 7, under the mandatory Consent gate).
 
    End the turn (after the item list) with:
 
@@ -134,7 +134,7 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
 
 6. **Turn 2 — User addresses items.** User responds per item. During dialogue:
    - For any "unsure" item, apply **condensed diamond** — enumerate ≥3 ways to resolve the drift with tradeoffs before helping the user converge on a bucket.
-   - Log significant choices to `decisions.log` per `steps/decide.md` (under the current iteration's header). In particular, every override of the suggested bucket gets a one-line decision entry capturing *why*.
+   - Track candidate decision-log entries in working memory — every override of the suggested bucket with a non-obvious reason is a candidate; routine agreement with the suggested bucket is not. The actual `spec/decisions.log` proposals happen in Turn 3 (step 7b and 7f), where they are presented in batch to the user via `steps/decide.md`'s mandatory Consent gate.
    - Do **not** apply changes yet. Wait until the user signals all items are addressed (or explicitly deferred to a later reconcile).
 
 7. **Turn 3 — Apply.** Compute the **final stage** from the highest-severity bucket used:
@@ -148,7 +148,7 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
 
    Honor the user's per-phase answer. Do not auto-clear.
 
-   **7b. Bucket 1 items.** For each, append an entry to `decisions.log` per `steps/decide.md`'s entry format. Use `**Context:**` line `during /spec reconcile (iteration <n>)`.
+   **7b. Bucket 1 items and bucket overrides.** Compose proposed entries for: (a) each bucket-1 item, and (b) each override of the suggested bucket where the user gave a substantive reason (routine overrides without articulated reasoning don't get an entry — and don't fabricate one). Use `**Context:**` line `during /spec reconcile (iteration <n>)`. Rationale for each must come from what the user said in Turn 2 — if a candidate entry has no user-supplied rationale, ask the user before proposing it ("What's the reason for routing this to bucket 1?"). Present every candidate entry in a single batched Consent gate per `steps/decide.md`'s auto-invocation protocol; write only the entries the user confirms. Skipping is the default for borderline items.
 
    **7c. Bucket 2 items.** Apply spec.md edits inline as a unified diff (small) or via direct `Write` (large) — same shape as `/spec revise` Turn 3. **MECE re-check** before applying. In iteration/adopted modes, verify `[delta]` / `[regression]` / `[adopted]` tags are still correct.
 
@@ -158,7 +158,7 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
 
    **7f. Promotion side effects.** For each bucket-2/3/4 item annotated `→ promotes D-XXX` (confirmed in step 4):
    - Remove `D-XXX` from `spec/deferred.md`.
-   - Append a `decisions.log` entry per `steps/decide.md`'s auto-invocation protocol: title `Promoted D-XXX into iteration <n> spec via reconcile`, decision `The drift item resolving D-XXX has been ratified into spec.md.`, related `Promoted from D-XXX, <list of AC IDs introduced/modified>`, context `via /spec reconcile (iteration <n>)`.
+   - Propose a `decisions.log` entry via `steps/decide.md`'s auto-invocation protocol (mandatory Consent gate; can be batched into the same gate as the 7b entries): title `Promoted D-XXX into iteration <n> spec via reconcile`, decision `The drift item resolving D-XXX has been ratified into spec.md.`, rationale supplied by user (typically the reason they confirmed the link in step 4 — ask if they didn't articulate one), related `Promoted from D-XXX, <list of AC IDs introduced/modified>`, context `during /spec reconcile (iteration <n>)`. If the user declines the gate, the deferred-item removal still stands — only the log entry is skipped.
 
    **7g. Update state.yaml.**
    - `last_command: /spec reconcile`, `last_command_at: <ISO timestamp>`.

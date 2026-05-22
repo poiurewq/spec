@@ -155,7 +155,7 @@ Read `state.yaml` first; validate stage. Write `state.yaml` only when the user c
 8. **Present evidence.** Read the report. Show the summary line, every GAP / UNCLEAR with one-line reasons, and any invariant regressions detected. Reference the full report path.
 
 9. **Ask the user to judge.** Three options:
-   - **Confirm** — phase is acceptable as-is (user may explicitly accept GAPs/UNCLEARs with rationale; if so, log them via `/spec decide` automatically with a one-line decision).
+   - **Confirm** — phase is acceptable as-is. If the user explicitly accepts GAPs/UNCLEARs with rationale, propose one decision-log entry per accepted gap via `steps/decide.md`'s auto-invocation protocol (mandatory Consent gate; batch them). Rationale must be the user's own words from the acceptance — do not synthesize one from the AC text. If the user accepts a gap without articulating *why*, ask before proposing the entry; the answer "fine for now, will revisit" is often a `/spec defer` candidate rather than a decision worth logging.
    - **Iterate** — user wants to fix issues; tell them to address the code, then re-run `/spec implement` (loops back to audit stage on this same phase).
    - **Abort** — back out; no state change.
 
