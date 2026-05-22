@@ -90,12 +90,14 @@ For housekeeping outside an interview — drop a deferred item the user no longe
 
 3. **Remove the item from `spec/deferred.md`.**
 
-4. **Append to `spec/decisions.log`** per `steps/decide.md`'s auto-invocation protocol:
+4. **Propose a `spec/decisions.log` entry** via `steps/decide.md`'s auto-invocation protocol (mandatory Consent gate):
    - Title: `Dropped deferred item D-XXX — <item title>`
    - Decision: `Dropped deferred item D-XXX without implementing.`
-   - Rationale: `<user's rationale>`
+   - Rationale: `<user's rationale verbatim>` (do not paraphrase aggressively, do not embellish)
    - Related: `Dropped from D-XXX`
-   - Context: `via /spec defer --resolve (iteration <n>)`
+   - Context: `during /spec defer --resolve (iteration <n>)`
+
+   If the user declines the gate, the drop from `spec/deferred.md` still stands — only the log entry is skipped, and drop `spec/decisions.log` from the proposed `git add` below.
 
 5. **Propose commit:**
    ```
@@ -130,9 +132,9 @@ Mental rule for new users:
 Cross-references between the two files happen on every state change of a deferred item:
 
 - **Item created via `/spec defer`** → entry in `deferred.md`. No `decisions.log` entry (the decision to defer is implicit; logging it is noise).
-- **Item dropped via `/spec defer --resolve drop` or interview triage** → removed from `deferred.md`; *one-line `decisions.log` entry* recording the drop with rationale.
-- **Item promoted via interview triage** → removed from `deferred.md`; *one-line `decisions.log` entry* recording the promotion ("Promoted D-XXX into iteration N spec"); the item then takes its place as one or more ACs in the new iteration's `spec.md`.
-- **Item promoted via `/spec reconcile` (drift-match case)** — same as interview promotion: removed from `deferred.md`; `decisions.log` entry; the spec edit lands in the current iteration's `spec.md` rather than a new one.
+- **Item dropped via `/spec defer --resolve drop` or interview triage** → removed from `deferred.md`; *proposed one-line `decisions.log` entry* recording the drop with the user's rationale, subject to `steps/decide.md`'s Consent gate (drop stands even if the user declines the gate).
+- **Item promoted via interview triage** → removed from `deferred.md`; *proposed one-line `decisions.log` entry* recording the promotion ("Promoted D-XXX into iteration N spec"), subject to the Consent gate; the item then takes its place as one or more ACs in the new iteration's `spec.md`.
+- **Item promoted via `/spec reconcile` (drift-match case)** — same as interview promotion: removed from `deferred.md`; *proposed `decisions.log` entry* (Consent gate); the spec edit lands in the current iteration's `spec.md` rather than a new one.
 
 ## Notes
 
