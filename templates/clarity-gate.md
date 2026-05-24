@@ -5,7 +5,7 @@ Rate each item yes or no. **Do not let the agent rate for you.** If any item is 
 ## Core items (both modes)
 
 1. **Goal.** Can I state what this project is, in one sentence, without hedging?
-2. **Constraints.** Have I listed the hard limits (tech, time, cost, compatibility, regulatory) that will shape the solution?
+2. **Constraints.** Have I listed the hard limits (tech, cost, compatibility, regulatory) that will shape the solution, *and* made a deliberate timebox decision — a hard deadline, a soft target, or explicitly open-ended (no timebox is a valid, complete answer)?
 3. **Success criteria.** Do I know, measurably, how I will tell whether this worked?
 4. **Scope boundary.** Can I name at least two things that are explicitly *not* in scope?
 5. **Root-vs-symptom.** Am I solving a root need, not a symptom — and can I articulate why in one sentence?

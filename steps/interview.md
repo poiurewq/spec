@@ -144,6 +144,10 @@ The goal of Part B is to articulate *what iteration N is for*, given the ratifie
    - `[iteration-scope]` — modifier on a Part A resolution indicating the current answer holds only for this iteration and is expected to be revisited in a future iteration (adoption mode only; always paired with one of the primary tags)
    - `[invariant-provisional]` — modifier on a Part B invariant indicating the invariant stands, but is explicitly *revisable under pressure* from specific real-world evidence (e.g., a user-surfaced bug that motivates refinement of a checklist or mechanism). Distinct from a regular invariant (change requires `/spec decide`) and from `[iteration-scope]` (scheduled change in a known future iteration): the trigger is evidence-driven refinement, not an iteration boundary. Use when the user wants to commit to an invariant's shape but acknowledge it hasn't been battle-tested enough to freeze rigidly. Adoption mode only; always paired with an invariant description and a named trigger (what evidence would motivate revision).
 
+## Timebox (Constraints axis, all modes)
+
+When covering Constraints, surface the timebox explicitly rather than leaving it implicit. Offer three framings and let the user pick: a **hard deadline** (ship by date X), a **soft target** (aim for X, slip if needed), or **open-ended** (no timebox — proceed until done). Open-ended is a fully legitimate, complete answer — do not nudge the user toward setting a deadline. Record the chosen framing in the `## Seed handoff` Constraints axis summary.
+
 ## Clarity gate (all modes)
 
 When coverage is sufficient (or after ~12 questions, whichever first), read and present `templates/clarity-gate.md`. In iteration or adopted modes, also present the appended iteration-specific items. **Ask the user to self-rate each item yes/no. Do not score for them.**
