@@ -5,6 +5,7 @@
 > Revision: <n>
 > Prior iteration: `spec/archive/<date>-v<n-1>-takeaway.md` (or "brownfield — no prior iteration through this skill")
 > Last updated: YYYY-MM-DD
+> **No forward iteration numbers.** Deferrals and "later" references use "a future iteration" (optionally near-term / medium-term / long-term), never a concrete `iter-N`. Current and past/baseline iteration references remain factual.
 
 ## Motivation
 
