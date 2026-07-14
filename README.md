@@ -47,7 +47,7 @@ spec/
 | `/spec seed` | Draft or revise `spec.md` from interview |
 | `/spec review` | Three parallel Sonnet personas critique the spec |
 | `/spec revise` | Three-turn: summarize → user addresses → propose revision |
-| `/spec check` | Convergence test (two consecutive wording-only revisions) |
+| `/spec check` | Convergence test (two consecutive wording-only revisions, or explicit product-owner prerogative) |
 | `/spec implement` | Orchestrates per-phase implementation: kickoff prompt for a fresh session, then per-phase Explore audit on re-run. Does **not** implement code itself |
 | `/spec verify` | Explore subagent audits code against spec, renders evidence |
 | `/spec reconcile` | Pull post-converge code drift back into the spec — bidirectional ingestion. Four-bucket triage (decision-only / minor / structural / major) routes stage regression accordingly |
@@ -77,8 +77,9 @@ Six stages per iteration, linear except for the review↔revise↔check loop:
                                                   revised ─── /spec review ──► in-review
                                                      │
                                                      │ /spec check
-                                              (not converged: stays revised)
-                                              (converged)
+                                              (not converged: stays revised;
+                                               or owner prerogative → converged)
+                                              (mechanical or prerogative)
                                                      ▼
                                                 converged ◄──┐
                                                      │       │ /spec implement (per-phase loop;
@@ -181,7 +182,7 @@ Acceptance criteria are the **verification** layer for an iteration, not the dur
 ## Design philosophy
 
 - **Clarity gate is self-rated**, never LLM-scored.
-- **Convergence is user-judged.** No embedding thresholds.
+- **Convergence is user-judged.** No embedding thresholds. Default stop rule: two consecutive wording-only revisions. Always available alternative: explicit **product-owner prerogative** (same `revised` → `converged` transition; log rationale records the path used).
 - **`/spec verify` renders evidence, not verdict.** The user decides pass/fail from the per-AC report.
 - **MECE enforced at two gates:** seed drafting and revise Turn 3.
 - **Condensed diamond** (≥3 alternatives at non-trivial decisions) is a cross-cutting norm, applied in interview, seed, and revise.
