@@ -55,18 +55,18 @@ Read state.yaml first; validate stage. Write state.yaml if convergence is declar
    - On valid explicit declaration → step 9 with path `prerogative`.
 
 9. **On convergence** (either path):
-   - Propose a `decisions.log` entry via `steps/decide.md`'s auto-invocation protocol (mandatory Consent gate):
+   - Propose a `decisions.md` entry via `steps/decide.md`'s auto-invocation protocol (mandatory Consent gate):
      - title: `Spec converged`
      - decision: `Converged at <short-SHA> on <YYYY-MM-DD>.` (use the tip short-SHA of `spec/spec.md` if available; if no commit yet, say `Converged (uncommitted / no spec.md SHA yet) on <YYYY-MM-DD>.`)
      - rationale — pick exactly one path form (true operational reason; no embellishment about why convergence matters):
        - **mechanical:** `Two consecutive wording-only revisions per /spec check.`
        - **prerogative:** `Product-owner prerogative — declared converged via /spec check.` When useful, append a short factual clause about what was overridden, e.g. ` (latest revision structural)`, ` (only one wording-only revision)`, or ` (fewer than two spec.md revisions)`. Do not invent extra motivation.
      - Alternatives: omit.
-   - The user may decline the gate; if so, the stage still transitions to `converged` — only the log entry is skipped, and drop `spec/decisions.log` from the proposed `git add` line below.
+   - The user may decline the gate; if so, the stage still transitions to `converged` — only the log entry is skipped, and drop `spec/decisions.md` from the proposed `git add` line below.
    - Update state.yaml: `stage: converged`, `last_command: /spec check`, `last_command_at`.
-   - Propose (drop `spec/decisions.log` from the `git add` if the user skipped the gate):
+   - Propose (drop `spec/decisions.md` from the `git add` if the user skipped the gate):
      ```
-     git add spec/decisions.log spec/state.yaml
+     git add spec/decisions.md spec/state.yaml
      git commit -m "spec: converged at <short-SHA>"
      ```
    - Tell the user: "Spec ready for implementation. After building, run `/spec verify` here to audit code against spec."

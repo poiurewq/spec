@@ -106,7 +106,7 @@ Starts right after `/spec close` of a prior iteration:
 
 - `spec.md` — current spec (the "Seed")
 - `takeaway.md` — last-closed iteration's shipped reality (appears after first `/spec close`)
-- `decisions.log` — cross-iteration decision history (past-tense, append-only)
+- `decisions.md` — cross-iteration decision history (past-tense, append-only)
 - `deferred.md` — cross-iteration backlog (future-tense, mutable; triaged at next interview)
 - `state.yaml` — current stage (skill-managed)
 - `archive/` — timestamped working files + per-iteration snapshots, all in one flat directory with `<date>-v<n>-<kind>.md` names

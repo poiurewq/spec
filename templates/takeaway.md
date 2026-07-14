@@ -1,6 +1,6 @@
 # <Project Name> — Takeaway: iteration <n>
 
-> Source spec: `../archive/v<NNN>-<YYYY-MM-DD-HHMM>-spec.md` (converged YYYY-MM-DD at SHA `<abc>`)
+> Source spec: `archive/v<NNN>-<YYYY-MM-DD-HHMM>-spec.md` (converged YYYY-MM-DD at SHA `<abc>`)
 > Implementation verified: YYYY-MM-DD (report: `archive/v<NNN>-<YYYY-MM-DD-HHMM>-verify.md`)
 > Verdict: PASS | PASS-WITH-ACCEPTED-GAPS
 
@@ -28,7 +28,7 @@
 
 ## Key decisions (this iteration)
 
-See `../decisions.log` under the `# Iteration <n>` header. Load-bearing ones summarized:
+See `decisions.md` under the `# Iteration <n>` header. Load-bearing ones summarized:
 
 - <short title> — <one-line rationale>
 - <short title> — <one-line rationale>

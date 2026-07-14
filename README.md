@@ -25,7 +25,7 @@ Force discipline at the input stage of software projects: surface assumptions, e
 spec/
 ├── spec.md                              # current iteration target
 ├── takeaway.md                          # appears after first /spec close
-├── decisions.log                        # cross-iteration, append-only (past-tense)
+├── decisions.md                        # cross-iteration, append-only (past-tense)
 ├── deferred.md                          # cross-iteration backlog (future-tense, mutable)
 ├── state.yaml                           # stage machine state (skill-writes only)
 └── archive/                             # flat, v-prefixed; working + snapshots
@@ -174,7 +174,7 @@ Notes:
 | Kind of state | Home | Re-surfaced how |
 |---|---|---|
 | Obvious from code | the code | re-derived into `## Current state [from-code]`, scoped to the iteration's touchpoints, at each interview/seed |
-| Load-bearing **but non-obvious** (would look arbitrary/cleanable to a future agent) | **invariant / provisional invariant**, or **`decisions.log`** | carried forward by name / rationale preserved |
+| Load-bearing **but non-obvious** (would look arbitrary/cleanable to a future agent) | **invariant / provisional invariant**, or **`decisions.md`** | carried forward by name / rationale preserved |
 | Existing behavior **at risk this iteration** | `[regression]` AC | re-verified by `/spec verify` |
 
 Acceptance criteria are the **verification** layer for an iteration, not the durable state tier; a spec therefore never needs to enumerate complete product state, and `Current state [from-code]` never chains back through archived specs (it re-reads code, so it can't go stale).
@@ -187,7 +187,7 @@ Acceptance criteria are the **verification** layer for an iteration, not the dur
 - **MECE enforced at two gates:** seed drafting and revise Turn 3.
 - **Condensed diamond** (≥3 alternatives at non-trivial decisions) is a cross-cutting norm, applied in interview, seed, and revise.
 - **One conversation per step.** Context stays bounded; each session serves one purpose.
-- **`decisions.log` is gated, not auto-filled.** Every append — even operational markers like "Spec converged" and "Iteration closed" — is presented to the user as a proposed entry first and only written on explicit confirmation. The append-only file fills up fast, and the gate is the only thing that keeps it usefully short. Deferred-item capture (`deferred.md`, mutable) intentionally has no gate — over-capture there is cheap.
+- **`decisions.md` is gated, not auto-filled.** Every append — even operational markers like "Spec converged" and "Iteration closed" — is presented to the user as a proposed entry first and only written on explicit confirmation. The append-only file fills up fast, and the gate is the only thing that keeps it usefully short. Deferred-item capture (`deferred.md`, mutable) intentionally has no gate — over-capture there is cheap.
 - **No fabricated rationale.** When recording *why* (a decision's `Rationale:` line, a spec's `Motivation`, an accepted-gap reason), the skill uses only reasons the user actually surfaced. Tightening or paraphrasing is fine; inventing plausible-sounding reasons from the shape of the artifact is not. When a user-supplied reason is thin or missing on a load-bearing field, the skill prompts the user rather than confabulating. **Founder-said-so is an acceptable terminal rationale** (e.g. `product-owner decision (no further justification given)`) — stop-and-ask still applies when rationale is missing; owner prerogative is a valid *answer* to that ask, not a bypass of it.
 - **No forward iteration-number projection.** Deferrals and "later" work say "a future iteration" (optionally near-term / medium-term / long-term), never a concrete future `iter-N`. Current and past/baseline references stay factual.
 
