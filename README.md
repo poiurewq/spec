@@ -166,6 +166,18 @@ Notes:
 - **If missing or malformed:** `/spec` bare offers to auto-reconstruct from archive/ filenames + `spec.md`/`takeaway.md` presence. Requires user confirmation before writing fresh state.yaml.
 - **No gap tracking in state.** Accepted GAP rationales live permanently in `takeaway.md`; state.yaml only drives stage transitions.
 
+## Where product state lives
+
+**The durable store of product state is the code (+ git history), not the spec.** The spec is a lens onto the code for one iteration. State is routed to three homes:
+
+| Kind of state | Home | Re-surfaced how |
+|---|---|---|
+| Obvious from code | the code | re-derived into `## Current state [from-code]`, scoped to the iteration's touchpoints, at each interview/seed |
+| Load-bearing **but non-obvious** (would look arbitrary/cleanable to a future agent) | **invariant / provisional invariant**, or **`decisions.log`** | carried forward by name / rationale preserved |
+| Existing behavior **at risk this iteration** | `[regression]` AC | re-verified by `/spec verify` |
+
+Acceptance criteria are the **verification** layer for an iteration, not the durable state tier; a spec therefore never needs to enumerate complete product state, and `Current state [from-code]` never chains back through archived specs (it re-reads code, so it can't go stale).
+
 ## Design philosophy
 
 - **Clarity gate is self-rated**, never LLM-scored.
@@ -175,7 +187,8 @@ Notes:
 - **Condensed diamond** (≥3 alternatives at non-trivial decisions) is a cross-cutting norm, applied in interview, seed, and revise.
 - **One conversation per step.** Context stays bounded; each session serves one purpose.
 - **`decisions.log` is gated, not auto-filled.** Every append — even operational markers like "Spec converged" and "Iteration closed" — is presented to the user as a proposed entry first and only written on explicit confirmation. The append-only file fills up fast, and the gate is the only thing that keeps it usefully short. Deferred-item capture (`deferred.md`, mutable) intentionally has no gate — over-capture there is cheap.
-- **No fabricated rationale.** When recording *why* (a decision's `Rationale:` line, a spec's `Motivation`, an accepted-gap reason), the skill uses only reasons the user actually surfaced. Tightening or paraphrasing is fine; inventing plausible-sounding reasons from the shape of the artifact is not. When a user-supplied reason is thin or missing on a load-bearing field, the skill prompts the user rather than confabulating.
+- **No fabricated rationale.** When recording *why* (a decision's `Rationale:` line, a spec's `Motivation`, an accepted-gap reason), the skill uses only reasons the user actually surfaced. Tightening or paraphrasing is fine; inventing plausible-sounding reasons from the shape of the artifact is not. When a user-supplied reason is thin or missing on a load-bearing field, the skill prompts the user rather than confabulating. **Founder-said-so is an acceptable terminal rationale** (e.g. `product-owner decision (no further justification given)`) — stop-and-ask still applies when rationale is missing; owner prerogative is a valid *answer* to that ask, not a bypass of it.
+- **No forward iteration-number projection.** Deferrals and "later" work say "a future iteration" (optionally near-term / medium-term / long-term), never a concrete future `iter-N`. Current and past/baseline references stay factual.
 
 ## Distilled from Ouroboros
 
