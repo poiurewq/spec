@@ -47,7 +47,7 @@ Once all GAPs/UNCLEARs are resolved or accepted:
    > Synthesize inputs:
    > - `spec/spec.md` — the converged intent.
    > - `spec/archive/<latest_verify-filename>` — the verify evidence report.
-   > - `spec/decisions.log` — entries under this iteration's header.
+   > - `spec/decisions.md` — entries under this iteration's header.
    > - Accepted gaps with rationales (injected inline here): <list from Turn 1, each as "AC<ref> — <rationale>">.
    > - Read a few relevant source files referenced in the verify report to flesh out the `## Shipped state [from-code]` section with concrete, file-referenced bullets.
    >
@@ -61,11 +61,11 @@ Once all GAPs/UNCLEARs are resolved or accepted:
 
 4. **User review.** Show the generator's summary. Ask user to read `spec/takeaway.md` and confirm or request edits. Do not proceed until confirmed.
 
-5. **Archive snapshots.** Copy:
+5. **Archive snapshots.** Copy (byte-for-byte — do **not** rewrite any relative links; artifact cross-references are `spec/`-relative by convention and stay valid from `spec/archive/` unchanged — see the cross-reference convention in `SKILL.md`):
    - `spec/spec.md` → `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-spec.md`
    - `spec/takeaway.md` → `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-takeaway.md`
 
-6. **Propose iteration-boundary marker** to `spec/decisions.log` via `steps/decide.md`'s auto-invocation protocol (mandatory Consent gate). Composed fields:
+6. **Propose iteration-boundary marker** to `spec/decisions.md` via `steps/decide.md`'s auto-invocation protocol (mandatory Consent gate). Composed fields:
    - **Title:** `Iteration <n> closed`
    - **Iteration:** `<n>` (current, before any future increment)
    - **Decision:** `Closed iteration <n> at spec.md SHA <short-sha>.`
@@ -75,7 +75,7 @@ Once all GAPs/UNCLEARs are resolved or accepted:
    - **Related:** omit unless a specific AC's accepted-gap rationale is the headline reason for closure.
    - **Context:** `during /spec close (iteration <n>)`
 
-   If the user declines the gate, the close still proceeds — only the log entry is skipped, and drop `spec/decisions.log` from the eventual `git add` (note: the Turn 2 commit uses `git add spec/` which picks up the log only if it changed, so no explicit adjustment is needed).
+   If the user declines the gate, the close still proceeds — only the log entry is skipped, and drop `spec/decisions.md` from the eventual `git add` (note: the Turn 2 commit uses `git add spec/` which picks up the log only if it changed, so no explicit adjustment is needed).
 
 7. **Update state.yaml:** `stage: closed`, `last_command: /spec close`, `last_command_at`. Reset `phases_implemented: []` so the next iteration starts with an empty per-phase audit trail.
 

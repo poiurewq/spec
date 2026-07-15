@@ -90,18 +90,18 @@ For housekeeping outside an interview — drop a deferred item the user no longe
 
 3. **Remove the item from `spec/deferred.md`.**
 
-4. **Propose a `spec/decisions.log` entry** via `steps/decide.md`'s auto-invocation protocol (mandatory Consent gate):
+4. **Propose a `spec/decisions.md` entry** via `steps/decide.md`'s auto-invocation protocol (mandatory Consent gate):
    - Title: `Dropped deferred item D-XXX — <item title>`
    - Decision: `Dropped deferred item D-XXX without implementing.`
    - Rationale: `<user's rationale verbatim>` (do not paraphrase aggressively, do not embellish)
    - Related: `Dropped from D-XXX`
    - Context: `during /spec defer --resolve (iteration <n>)`
 
-   If the user declines the gate, the drop from `spec/deferred.md` still stands — only the log entry is skipped, and drop `spec/decisions.log` from the proposed `git add` below.
+   If the user declines the gate, the drop from `spec/deferred.md` still stands — only the log entry is skipped, and drop `spec/decisions.md` from the proposed `git add` below.
 
 5. **Propose commit:**
    ```
-   git add spec/deferred.md spec/decisions.log
+   git add spec/deferred.md spec/decisions.md
    git commit -m "defer: drop D-XXX — <short title>"
    ```
 
@@ -125,16 +125,16 @@ When another step's dialogue reveals an item that should be shelved (user says "
 
 Mental rule for new users:
 
-- **Past-tense → `decisions.log`.** What we decided (positively, negatively-permanent, or meta). Append-only.
+- **Past-tense → `decisions.md`.** What we decided (positively, negatively-permanent, or meta). Append-only.
 - **Future-tense, committed → `spec/spec.md`.** What we are building this iteration.
 - **Future-tense, uncommitted → `spec/deferred.md`.** Backlog. Mutable.
 
 Cross-references between the two files happen on every state change of a deferred item:
 
-- **Item created via `/spec defer`** → entry in `deferred.md`. No `decisions.log` entry (the decision to defer is implicit; logging it is noise).
-- **Item dropped via `/spec defer --resolve drop` or interview triage** → removed from `deferred.md`; *proposed one-line `decisions.log` entry* recording the drop with the user's rationale, subject to `steps/decide.md`'s Consent gate (drop stands even if the user declines the gate).
-- **Item promoted via interview triage** → removed from `deferred.md`; *proposed one-line `decisions.log` entry* recording the promotion ("Promoted D-XXX into iteration N spec"), subject to the Consent gate; the item then takes its place as one or more ACs in the new iteration's `spec.md`.
-- **Item promoted via `/spec reconcile` (drift-match case)** — same as interview promotion: removed from `deferred.md`; *proposed `decisions.log` entry* (Consent gate); the spec edit lands in the current iteration's `spec.md` rather than a new one.
+- **Item created via `/spec defer`** → entry in `deferred.md`. No `decisions.md` entry (the decision to defer is implicit; logging it is noise).
+- **Item dropped via `/spec defer --resolve drop` or interview triage** → removed from `deferred.md`; *proposed one-line `decisions.md` entry* recording the drop with the user's rationale, subject to `steps/decide.md`'s Consent gate (drop stands even if the user declines the gate).
+- **Item promoted via interview triage** → removed from `deferred.md`; *proposed one-line `decisions.md` entry* recording the promotion ("Promoted D-XXX into iteration N spec"), subject to the Consent gate; the item then takes its place as one or more ACs in the new iteration's `spec.md`.
+- **Item promoted via `/spec reconcile` (drift-match case)** — same as interview promotion: removed from `deferred.md`; *proposed `decisions.md` entry* (Consent gate); the spec edit lands in the current iteration's `spec.md` rather than a new one.
 
 ## Notes
 

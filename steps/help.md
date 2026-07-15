@@ -18,7 +18,7 @@ Most AI-assisted development fails at the input stage. `/spec` gives you a disci
 2. **Seed** — in a fresh conversation you draft `spec/spec.md` from the interview transcript (steerable; not a sub-agent).
 3. **Review** — three skeptical personas (Ontologist, Contrarian, Simplifier) critique in parallel.
 4. **Revise** — you address each critique in conversation; the agent proposes the revision.
-5. **Check** — declare convergence when two consecutive revisions changed only wording.
+5. **Check** — declare convergence when two consecutive revisions changed only wording, or explicitly via product-owner prerogative.
 6. **Implement** — walk the spec's `## Implementation phases` one phase at a time. Each call kicks off a fresh implementation session, then audits that phase's ACs on re-run. Optional — skip if the spec has no phases or you prefer to implement freely and run `/spec verify` directly.
 7. **Verify** — full-spec audit: per-AC PASS / GAP / UNCLEAR evidence report.
 8. **Close** — resolve gaps, generate the takeaway, archive the iteration. Ready for iteration N+1.
@@ -106,7 +106,7 @@ Starts right after `/spec close` of a prior iteration:
 
 - `spec.md` — current spec (the "Seed")
 - `takeaway.md` — last-closed iteration's shipped reality (appears after first `/spec close`)
-- `decisions.log` — cross-iteration decision history (past-tense, append-only)
+- `decisions.md` — cross-iteration decision history (past-tense, append-only)
 - `deferred.md` — cross-iteration backlog (future-tense, mutable; triaged at next interview)
 - `state.yaml` — current stage (skill-managed)
 - `archive/` — timestamped working files + per-iteration snapshots, all in one flat directory with `<date>-v<n>-<kind>.md` names

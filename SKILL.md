@@ -13,14 +13,14 @@ Human-driven, agent-assisted spec-development: Socratic interview gated by a sel
 
 1. **Self-rated clarity gate.** Never auto-score ambiguity. Present `templates/clarity-gate.md`; user rates.
 2. **MECE acceptance criteria.** Enforce at seed drafting and after every revision.
-3. **Condensed diamond.** At every non-trivial decision, enumerate ≥3 alternatives before committing. Losers → `decisions.log`.
+3. **Condensed diamond.** At every non-trivial decision, enumerate ≥3 alternatives before committing. Losers → `decisions.md`.
 4. **Plain text + git.** All artifacts under `./spec/`. User commits; skill proposes messages.
 5. **Separate conversations for generative steps.** Interview, seed, revise, and close deserve fresh sessions (seed drafts in-conversation so the user can steer at AC/phase forks). Persona reviews are bounded sub-agents.
 6. **Sub-agent model is Sonnet; always pass `background: false`.** Pass `model: "sonnet"` in every Agent invocation — no step uses an Opus sub-agent; seed (the only Opus-quality drafting step) runs in-conversation in a fresh session, not as a sub-agent. `/spec verify` and `/spec adopt` additionally use `subagent_type: "Explore"`, but only after a **triage step** — if scope is narrow (few ACs/invariants or a small project), the orchestrator gathers evidence directly without spawning; see each step file for the exact triage criteria. Always include `background: false` explicitly in every Agent invocation — every step that spawns a sub-agent has downstream logic (verify the report exists, present evidence, ask the user to judge) that depends on the sub-agent's result, so the parent session must always wait for it in the foreground.
 7. **Sub-agents that write files must have a fallback.** Every sub-agent prompt that instructs the agent to write to a path under `spec/` must include the instruction: *"Attempt the Write tool for the target path. If Write is denied, retry once; if still denied, include the full intended file content verbatim in your final reply inside a fenced code block labeled with the target absolute path, so the parent session can write it. Never report success without either having written the file or having dumped its full content."* The parent session must then check: if the file does not exist after the sub-agent returns, extract the dumped content and write it directly.
 8. **Evidence, not verdict.** `/spec verify` gathers evidence; the user judges pass/fail.
 9. **State is explicit.** `spec/state.yaml` is the single source of truth for stage, iteration number, and mode. Read at the start of every subcommand; write at the end.
-10. **Decision logging requires explicit user consent.** `spec/decisions.log` fills up fast — minor tweaks and silent overrides of earlier entries quickly make the log unwieldy. Never auto-write an entry. Every `decisions.log` append (including auto-invocations from other steps, including operational markers like "Spec converged" and "Iteration closed") must be presented to the user as a proposed entry first, and only written on explicit confirmation. See `steps/decide.md` for the gate protocol. Deferred-item capture (`spec/deferred.md`) does **not** carry this gate — the file is mutable and triaged at every interview, so over-capture is cheap; only `decisions.log` (append-only, permanent) requires the gate.
+10. **Decision logging requires explicit user consent.** `spec/decisions.md` fills up fast — minor tweaks and silent overrides of earlier entries quickly make the log unwieldy. Never auto-write an entry. Every `decisions.md` append (including auto-invocations from other steps, including operational markers like "Spec converged" and "Iteration closed") must be presented to the user as a proposed entry first, and only written on explicit confirmation. See `steps/decide.md` for the gate protocol. Deferred-item capture (`spec/deferred.md`) does **not** carry this gate — the file is mutable and triaged at every interview, so over-capture is cheap; only `decisions.md` (append-only, permanent) requires the gate.
 11. **No fabricated rationale or motivation.** When recording *why* — the `Rationale:` line of a decision, the `Motivation` section of `spec.md`, or any other "why" the skill writes on the user's behalf — use only reasons the user actually surfaced in conversation. Paraphrasing, tightening, or re-ordering user-supplied reasons is fine. Inventing a plausible-sounding reason, retro-justifying a choice the user made without explanation, or extrapolating from the shape of the artifact to manufacture a motivation is **not**. When the user-supplied reason is thin or missing and the field is load-bearing, stop and ask: "What's the underlying reason here?" — surfacing the gap is correct; filling it with confabulation is not. **The product owner's bare prerogative is a complete, acceptable rationale** requiring no further justification — e.g. `Rationale: product-owner decision (no further justification given).` Stop-and-ask remains correct when a load-bearing rationale is genuinely missing; *founder-said-so* is a valid **answer** to that ask, not a bypass of it. When the owner declines to justify a call, record it as owner-prerogative **truthfully** rather than pressing for a manufactured "why."
 12. **No forward iteration-number projection.** A spec must not project work onto specific future iteration numbers. Forward-looking references — deferrals, runway arguments, "reserved for later" fields — use **"a future iteration"** and, where useful, a temporal-distance qualifier (**near-term / medium-term / long-term**) instead of a concrete `iter-N`. References to the **current** iteration and to **past / baseline** iterations are factual and remain as-is. Future iteration numbers are guesses that ossify into false commitments; the deferral is real, the iteration assignment is not.
 
@@ -50,7 +50,7 @@ Human-driven, agent-assisted spec-development: Socratic interview gated by a sel
 spec/
 ├── spec.md                              # current iteration target
 ├── takeaway.md                          # appears after first /spec close
-├── decisions.log                        # cross-iteration, append-only (past-tense)
+├── decisions.md                         # cross-iteration, append-only (past-tense)
 ├── deferred.md                          # cross-iteration backlog (future-tense, mutable)
 ├── state.yaml                           # stage machine state (skill-writes only)
 └── archive/                             # flat, v-prefixed; working + snapshots
@@ -62,6 +62,8 @@ spec/
 ```
 
 Create `spec/` and `spec/archive/` on first use.
+
+**Cross-reference convention — paths are `spec/`-relative, resolved logically.** When one artifact references another spec artifact (e.g. a takeaway pointing at `decisions.md` or at `archive/v<NNN>-…-spec.md`), write the path **relative to `spec/`** — the artifact root — not relative to the referencing file's own directory. For a file directly under `spec/` this is just its bare name (`decisions.md`, `deferred.md`); for an archived file it is `archive/<name>`. Rationale: an artifact may live at `spec/` (the live copy) *or* be snapshot-copied under `spec/archive/` (via `/spec close`), and only a `spec/`-relative logical reference stays valid in both locations — which is why archival is a plain copy that never rewrites links (see `steps/close.md`). Do **not** prefix these with `../`. Sibling-repo references (e.g. `../haptic-site/`) are a *separate* convention — project-root-relative, pointing outside `spec/` — and are unaffected by this rule.
 
 ## state.yaml schema
 
@@ -83,6 +85,8 @@ phases_implemented: [<int>]              # phase numbers user confirmed via /spe
 **Skill is the sole writer.** Accepted GAP rationales from `/spec close` live in `takeaway.md`, not here.
 
 **Backward compatibility — `phase:` → `stage:` rename.** The `phase:` field was renamed to `stage:` (the values are unchanged: `interviewing | seeded | … | closed`). When you read `state.yaml` and see a legacy `phase:` key instead of `stage:`, treat it as `stage:` — it carries the same meaning and the same value set. On the next write to `state.yaml`, rewrite the key as `stage:` (do not preserve `phase:`). Do not be confused by the old name; do not refuse to operate on legacy state files.
+
+**Backward compatibility — `decisions.log` → `decisions.md` rename.** The decision log is now `spec/decisions.md` (Markdown extension, so editors, GitHub, and Markdown apps render it; consistent with the sibling `deferred.md`). Older projects may still have `spec/decisions.log` — identical content, legacy name. Whenever a step reads or appends the decision log: prefer `spec/decisions.md`; if it is absent but `spec/decisions.log` exists, treat the `.log` file as the decision log and `git mv spec/decisions.log spec/decisions.md` as part of that step's write (so the rename lands in the same commit the step already proposes). Never maintain both files, and never create a fresh `decisions.md` while a `decisions.log` still holds the history.
 
 ## `/spec` bare — state detection
 
@@ -132,4 +136,4 @@ Entry-point subcommands that can create a fresh `spec/state.yaml` accept an opti
 
 ## Commits
 
-After any step that writes `spec/spec.md`, `spec/takeaway.md`, `spec/decisions.log`, or produces archive snapshots, propose the exact `git add` + `git commit` command. Do not run it. `state.yaml` is committed alongside any step that transitions stage.
+After any step that writes `spec/spec.md`, `spec/takeaway.md`, `spec/decisions.md`, or produces archive snapshots, propose the exact `git add` + `git commit` command. Do not run it. `state.yaml` is committed alongside any step that transitions stage.

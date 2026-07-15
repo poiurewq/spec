@@ -1,6 +1,6 @@
 # /spec decide — Decision log
 
-Record a significant decision to `spec/decisions.log`. **Past-tense only** — what was already decided (positively, negatively-permanent, or meta). For future-tense items (feature requests, bugs, ideas not yet committed to any iteration), use `/spec defer` instead, which writes to `spec/deferred.md`.
+Record a significant decision to `spec/decisions.md`. **Past-tense only** — what was already decided (positively, negatively-permanent, or meta). For future-tense items (feature requests, bugs, ideas not yet committed to any iteration), use `/spec defer` instead, which writes to `spec/deferred.md`.
 
 ## State machine
 
@@ -13,12 +13,12 @@ Record a significant decision to `spec/decisions.log`. **Past-tense only** — w
 - **Explicit invocation forms:**
   - `/spec decide` — fully interactive.
   - `/spec decide "<decision sentence>"` — one-shot decision text; rationale and alternatives still asked interactively.
-  - `/spec decide --supersedes DEC-NNN "<decision sentence>"` — flags this entry as revising an earlier decision. Accepts `--supersedes DEC-NNN`, `--supersedes=DEC-NNN`. Validates that `DEC-NNN` exists in `spec/decisions.log`; if not, error and re-prompt.
+  - `/spec decide --supersedes DEC-NNN "<decision sentence>"` — flags this entry as revising an earlier decision. Accepts `--supersedes DEC-NNN`, `--supersedes=DEC-NNN`. Validates that `DEC-NNN` exists in `spec/decisions.md`; if not, error and re-prompt.
 
 ## When this runs
 
 - **Explicitly** — user runs one of the forms above.
-- **Automatically** — during any step, when the user makes a non-obvious choice with rationale (ruling out scope, picking an interpretation, accepting/rejecting a persona critique with reason, choosing one AC structuring over alternatives). The calling step *proposes* the entry; nothing is written until the user explicitly confirms via the **Consent gate** below. There is no "log inline, don't interrupt flow" path — `decisions.log` fills up fast, and silent appends are how it becomes unreadable.
+- **Automatically** — during any step, when the user makes a non-obvious choice with rationale (ruling out scope, picking an interpretation, accepting/rejecting a persona critique with reason, choosing one AC structuring over alternatives). The calling step *proposes* the entry; nothing is written until the user explicitly confirms via the **Consent gate** below. There is no "log inline, don't interrupt flow" path — `decisions.md` fills up fast, and silent appends are how it becomes unreadable.
 
 ## Consent gate (all auto-invocations)
 
@@ -58,7 +58,7 @@ Before writing any entry from auto-invocation:
 
 4. **Write the confirmed entries** per the entry format below. One-line user-facing mention per written entry: "Logged decision: DEC-NNN — <title>."
 
-5. **Do not propose a mid-step commit.** The parent step's commit proposal already includes `spec/decisions.log`. If every proposed entry was skipped (`n all`), drop `spec/decisions.log` from the parent step's `git add` line — there is nothing to commit.
+5. **Do not propose a mid-step commit.** The parent step's commit proposal already includes `spec/decisions.md`. If every proposed entry was skipped (`n all`), drop `spec/decisions.md` from the parent step's `git add` line — there is nothing to commit.
 
 ### Rationale and anti-rationalization
 
@@ -74,7 +74,7 @@ The skill must not invent reasons. This is a hard rule:
 
 **Always append — never insert.** Add the new entry at the end of the file. The file is strictly append-only; placing a new entry anywhere other than the end corrupts the chronological record and violates the cross-iteration audit trail.
 
-Append to `spec/decisions.log`. If first write ever, create with header:
+Append to `spec/decisions.md`. If first write ever, create with header:
 ```
 # Decision log
 
@@ -102,18 +102,18 @@ Entry format:
 
 **Field rules:**
 
-- **ID (`DEC-NNN`)** — zero-padded to 3 digits. Compute next ID by scanning `spec/decisions.log` for lines matching `^## DEC-(\d+)`, taking the max, and incrementing. Default to `DEC-001` if none found. IDs are stable for the entry's lifetime; do not reuse IDs.
+- **ID (`DEC-NNN`)** — zero-padded to 3 digits. Compute next ID by scanning `spec/decisions.md` for **entry-initial** DEC-NNN ids in either entry format — the block header `^## DEC-(\d+)` **or** the inline-bullet header `^- \*\*DEC-(\d+)\*\*` (combined: `^(?:## |- \*\*)DEC-0*(\d+)`) — taking the **numeric** max (strip zero-padding before comparing) and incrementing. The `^` anchor is load-bearing: it excludes mid-line cross-references (`**Related:** DEC-100`, `**Supersedes** DEC-095`) so only entry-defining ids are counted. Default to `DEC-001` if none found. IDs are stable for the entry's lifetime; do not reuse IDs.
 - **Iteration** — value of `iteration` in `state.yaml` at write time. If `state.yaml` does not exist (rare — pre-onboarding), use `0`.
 - **Supersedes** — points at a single prior `DEC-NNN` that this decision revises. Forward-only pointer (we never modify the prior entry to record the reverse direction — that would violate append-only). Validate the target exists when writing; reject if not.
 - **Related** — free-form list of `AC<id>` references and/or `Invariant <n>` references. Used as a backlink for searches like "why is AC2.3 the way it is?" Examples: `AC2.3`, `AC1, Invariant 4`, `Invariant 2`. Omit the line if no relations are obvious.
 - **Context** — free-text, *what* triggered the decision (which step, which review concern, etc.). Distinct from Iteration (structured, always present) and from any cross-reference fields.
 
-**Legacy entries.** Pre-existing `decisions.log` files (from before this format was introduced) may contain entries without `DEC-NNN` IDs. The skill does **not** retroactively edit them. ID computation scans only `^## DEC-` lines; legacy entries are ignored for ID purposes and stay as-is. Cross-references can only point at IDed entries.
+**Legacy entries.** Pre-existing `decisions.md` files (from before this format was introduced) may contain entries without `DEC-NNN` IDs. The skill does **not** retroactively edit them. Only **un-IDed** entries (no `DEC-NNN` token at all) are ignored for ID purposes and stay as-is; IDed entries are counted **regardless of whether they use the `## ` header or the `- **` bullet prefix** — some logs are written entirely in the bullet form, and those ids are real and must be included in the max. Cross-references can only point at IDed entries.
 
 ## Protocol for explicit invocation
 
 1. **Parse arguments.**
-   - If `--supersedes DEC-NNN` was provided: validate the target exists in `spec/decisions.log`. If not, error: "DEC-NNN not found in decisions.log" and stop (or re-prompt if interactive).
+   - If `--supersedes DEC-NNN` was provided: validate the target exists in `spec/decisions.md`. If not, error: "DEC-NNN not found in decisions.md" and stop (or re-prompt if interactive).
    - If a decision sentence was supplied as the bare argument, hold it for step 2.
 
 2. **Decision sentence.** If not supplied via argument, ask: "What's the decision, in one sentence?"
@@ -126,7 +126,7 @@ Entry format:
 
 6. **Related.** Ask: "Are there specific ACs or invariants this decision affects? List them (e.g., `AC2.3, Invariant 4`), or `none`."
 
-7. **Compute next ID.** Scan `spec/decisions.log` per the ID rule above.
+7. **Compute next ID.** Scan `spec/decisions.md` per the ID rule above.
 
 8. **Compose and append entry.** Use the format above. Read `iteration` from `state.yaml` for the `Iteration:` field. Set `Context:` to a brief description of the user's setting (or empty if the user didn't provide one).
 
@@ -134,7 +134,7 @@ Entry format:
 
 10. **Propose commit:**
     ```
-    git add spec/decisions.log
+    git add spec/decisions.md
     git commit -m "decide: <DEC-NNN — short title>"
     ```
 
@@ -156,4 +156,4 @@ When another step's dialogue produces a decision worth logging (the calling step
 
 2. **Traverse the Consent gate** above. Compute `DEC-NNN` (per the ID rule) only at the moment of writing — i.e., after the user has confirmed.
 
-3. **Write confirmed entries; skip declined ones.** Emit one-line mention per written entry: "Logged decision: DEC-NNN — <title>." Don't propose a mid-step commit — the parent step's commit proposal will include `spec/decisions.log` (or drop it if every entry was skipped).
+3. **Write confirmed entries; skip declined ones.** Emit one-line mention per written entry: "Logged decision: DEC-NNN — <title>." Don't propose a mid-step commit — the parent step's commit proposal will include `spec/decisions.md` (or drop it if every entry was skipped).
