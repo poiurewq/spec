@@ -16,7 +16,7 @@ Force discipline at the input stage of software projects: surface assumptions, e
 - **Artifacts under `./spec/`** in the user's project directory
 - **State tracked in `./spec/state.yaml`** — single source of truth for stage, iteration, mode
 - **Seed drafts in-conversation** in a fresh, steerable session; persona reviews run as Sonnet sub-agents
-- **`Explore` subagent** for `/spec verify` codebase reading
+- **`Explore` subagent** for codebase reading on verify / implement audit / adopt / reconcile / interview — only after triage; skipped when scope is narrow **or** the orchestrator already has enough session context (see SKILL.md principle 6)
 - **Plain text + git** — no databases, no hidden state
 
 ## File layout (user's cwd)
@@ -76,8 +76,8 @@ Per-phase `/spec implement` audits that touch `[external]` ACs should honor the 
 | `/spec review` | Three parallel Sonnet personas critique the spec |
 | `/spec revise` | Three-turn: summarize → user addresses → propose revision |
 | `/spec check` | Convergence test (two consecutive wording-only revisions, or explicit product-owner prerogative) |
-| `/spec implement` | Orchestrates per-phase implementation: kickoff prompt for a fresh session, then per-phase Explore audit on re-run. Does **not** implement code itself |
-| `/spec verify` | Explore subagent audits code against spec, renders evidence |
+| `/spec implement` | Orchestrates per-phase implementation: kickoff prompt for a fresh session, then per-phase audit on re-run (direct or Explore after triage). Does **not** implement code itself |
+| `/spec verify` | Audits code against spec and renders evidence (direct or Explore after triage) |
 | `/spec reconcile` | Pull post-converge code drift back into the spec — bidirectional ingestion. Four-bucket triage (decision-only / minor / structural / major) routes stage regression accordingly |
 | `/spec close` | Finalize iteration: resolve gaps, generate takeaway, archive |
 | `/spec decide` | Log a decision (explicit or proposed mid-step under a mandatory user-consent gate) — past-tense; never auto-written without confirmation |
@@ -155,13 +155,13 @@ Every step file includes a `## State machine` section at the top declaring these
 
 ## Implementation: orchestrated, not performed
 
-The skill does **not** implement code itself. Implementation happens in fresh conversations the user opens — the principle "separate conversations for generative steps" applies, and implementation is the lowest-ambiguity step in the loop (the spec's `[delta]`-tagged ACs already enumerate every deliverable). What the skill *does* provide, via `/spec implement`, is **orchestration**: walking through the spec's `## Implementation phases` one phase at a time, with a per-phase Explore audit between phases as an early-warning evidence layer before the final full-spec `/spec verify`.
+The skill does **not** implement code itself. Implementation happens in fresh conversations the user opens — the principle "separate conversations for generative steps" applies, and implementation is the lowest-ambiguity step in the loop (the spec's `[delta]`-tagged ACs already enumerate every deliverable). What the skill *does* provide, via `/spec implement`, is **orchestration**: walking through the spec's `## Implementation phases` one phase at a time, with a per-phase audit between phases (in-session or Explore after triage) as an early-warning evidence layer before the final full-spec `/spec verify`.
 
 **Recipe (with phases declared):**
 
 1. Run `/spec implement` after `converged`. It identifies the next un-confirmed phase, shows you its ACs, and gives you a copy-pasteable kickoff prompt.
 2. Open a fresh conversation, paste the kickoff prompt, implement just that phase. The prompt restricts scope to the current phase's ACs and reminds the agent to preserve `[adopted]` claims, `## Invariants`, and `## Provisional invariants`.
-3. Return to the `/spec implement` session and re-run the command. It runs an Explore audit over only that phase's ACs (plus any plausibly-touched invariants), presents per-AC PASS/GAP/UNCLEAR evidence, and asks you to confirm.
+3. Return to the `/spec implement` session and re-run the command. It audits only that phase's ACs (plus any plausibly-touched invariants) — in-session when context is already sufficient or scope is narrow, otherwise via Explore — presents per-AC PASS/GAP/UNCLEAR evidence, and asks you to confirm.
 4. On confirm, the phase is appended to `phases_implemented` and the skill proposes a per-phase commit. Repeat for the next phase.
 5. When all phases are confirmed, run `/spec verify` for the full-spec audit, then `/spec close`.
 

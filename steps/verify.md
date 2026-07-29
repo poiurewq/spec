@@ -1,6 +1,6 @@
 # /spec verify — Audit code against spec
 
-Spawn an `Explore` sub-agent to render a per-AC evidence report comparing `spec/spec.md` to the current codebase. **The agent gathers evidence. You render the verdict.**
+Render a per-AC evidence report comparing `spec/spec.md` to the current codebase — either in-session (narrow scope or already-has-context) or via an `Explore` sub-agent after triage. **The orchestrator gathers evidence. You render the verdict.**
 
 ## State machine
 
@@ -41,8 +41,11 @@ Read state.yaml first; validate stage. Write state.yaml on completion.
 
    Document this mechanism for skill consumers in `README.md` (§ Search-scope allowlist).
 
-   - **Direct path — handle in-session** if **all** hold: total leaf ACs + invariants ≤ 5, AND source code is concentrated in ≤ 3 directories. Use Bash `grep`/`find` and Read to locate evidence for each AC and invariant, honoring the allowlist rules above. Write the report yourself to `spec/archive/<FILENAME>` using the exact structure shown in the sub-agent prompt below. Proceed to step 5.
-   - **Sub-agent path** — if any condition above fails (wide scope, many ACs, or breadth makes targeted passes unreliable): use the Agent tool with `subagent_type: "Explore"` and `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7** **and** the search-scope allowlist block below (expand with the project's actual allowlist contents if the file exists). Prompt:
+   - **Direct path — handle in-session** if **either** holds:
+     1. **Already-has-context** (SKILL.md principle 6): you already know enough about the relevant code in this session to write a complete per-AC evidence report with real `file:line` refs without a fresh broad scan — skip Explore and gather/write the report yourself. Prefer this when true to save tokens.
+     2. **Quantitative narrowness:** total leaf ACs + invariants ≤ 5, AND source code is concentrated in ≤ 3 directories.
+     In either case: use Bash `grep`/`find` and Read as needed to locate evidence for each AC and invariant, honoring the allowlist rules above. Write the report yourself to `spec/archive/<FILENAME>` using the exact structure shown in the sub-agent prompt below. Proceed to step 5.
+   - **Sub-agent path** — if neither direct-path gate holds (wide scope *and* insufficient session context for a reliable report): use the Agent tool with `subagent_type: "Explore"` and `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7** **and** the search-scope allowlist block below (expand with the project's actual allowlist contents if the file exists). Prompt:
 
    > Read `spec/spec.md`. For **each acceptance criterion** in the AC tree (at every level — AC1, AC1.1, AC1.2, etc.):
    >

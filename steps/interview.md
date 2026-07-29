@@ -58,7 +58,10 @@ If starting fresh (no state.yaml or coming from `closed`):
    - **If `spec/takeaway.md` exists** — read it. Ask user to confirm it still reflects shipped reality; note any drift.
    - **Otherwise (brownfield first iteration)** — ask the user to point at the prior spec (if any), relevant code paths, and any design docs. Then offer:
      > "Should I spawn an Explore sub-agent to summarize the relevant code into a `## Current state [from-code]` section for this interview, or would you rather describe current state yourself?"
-     If yes, triage before spawning: if the user named ≤ 3 specific files or a single narrow directory, read those paths directly with Read and Bash, then append the `## Current state [from-code]` section yourself — no sub-agent needed. Otherwise (broad directory, "entire codebase", or many paths) spawn Agent with `subagent_type: "Explore"`, `model: "sonnet"`, prompt narrowly scoped to the user-specified paths with output appended to the session file. The sub-agent prompt must include the **write-fallback instruction from SKILL.md principle 7** — attempt to append to the session file; on Write denial, retry once, then dump full content in the reply. After the sub-agent returns, verify the append landed; if not, write it from the parent session.
+     If yes, triage before spawning (SKILL.md principle 6 — either gate skips Explore):
+     - **Already-has-context:** if you already know enough about the named paths/code in this session to write a solid `## Current state [from-code]` section with real `file:line` refs, do it yourself — no sub-agent. Prefer this when true to save tokens.
+     - **Quantitative narrowness:** if the user named ≤ 3 specific files or a single narrow directory, read those paths directly with Read and Bash, then append the section yourself.
+     - **Otherwise** (broad directory, "entire codebase", or many paths, *and* insufficient session context): spawn Agent with `subagent_type: "Explore"`, `model: "sonnet"`, prompt narrowly scoped to the user-specified paths with output appended to the session file. The sub-agent prompt must include the **write-fallback instruction from SKILL.md principle 7** — attempt to append to the session file; on Write denial, retry once, then dump full content in the reply. After the sub-agent returns, verify the append landed; if not, write it from the parent session.
 
 3. **Deferred-items triage** (before intent questions; after context ingestion). If `spec/deferred.md` exists and contains at least one item:
 
@@ -87,7 +90,7 @@ If starting fresh (no state.yaml or coming from `closed`):
    - Apply the **condensed diamond** at interpretation forks.
 
 5. **Tag every answer** in the transcript:
-   - `[from-code]` — facts about the current codebase (from user or Explore sub-agent)
+   - `[from-code]` — facts about the current codebase (from user, orchestrator, or Explore)
    - `[from-user]` — user decisions, preferences, priorities (not externally verifiable)
    - `[from-research]` — external facts (API docs, compatibility, pricing) with source reference
 
@@ -101,7 +104,7 @@ The adoption interview is a **two-part** flow with an explicit checkpoint betwee
 
 ### Setup (both parts)
 
-1. **Open the existing session file.** Do **not** create a new one. Read its `## Adopted context (pre-interview)` section in full — it contains `[from-code]` bullets, `[from-rough-spec]` claims (if any), and an Ambiguities list produced by the adoption Explore sub-agent.
+1. **Open the existing session file.** Do **not** create a new one. Read its `## Adopted context (pre-interview)` section in full — it contains `[from-code]` bullets, `[from-rough-spec]` claims (if any), and an Ambiguities list produced at adoption time.
 
 2. **Append a new `## Socratic interview` section** below the pre-populated context. Under it, create two subsections up front — `### Part A — Ratify current state` and `### Part B — Intent for this iteration` — so transcript entries land under the correct part as you go.
 

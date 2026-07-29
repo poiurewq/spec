@@ -69,7 +69,7 @@ One-shot bootstrap, then the normal loop. The adoption iteration (iteration 1 by
 
 ```
 /spec setup                    # one-time; routes you to /spec adopt
-/spec adopt                    # asks for rough spec doc path + optional focus paths; Explore sub-agent ingests
+/spec adopt                    # asks for rough spec doc path + optional focus paths; ingests codebase (direct or Explore)
 /spec interview                # resumes the pre-populated session file; ratify, correct, pass clarity gate
 /spec seed                     # drafts spec.md from iteration template; ACs tagged [adopted] (claim) / [delta] / [regression]
 /spec review

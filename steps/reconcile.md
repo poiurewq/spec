@@ -48,9 +48,13 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
    - Count total leaf ACs + invariants in `spec/spec.md`.
    - Count source breadth: `find . -mindepth 1 -maxdepth 2 -not -path '*/\.*' -not -path '*/node_modules/*' -type d | wc -l`.
 
-   Direct path — handle in-session — if **all** hold: total leaf ACs + invariants ≤ 5, AND source code is concentrated in ≤ 3 directories. Use Bash `grep`/`find` and Read to compile the drift report yourself directly into the structure shown in the sub-agent prompt below.
+   Direct path — handle in-session — if **either** holds:
+   1. **Already-has-context** (SKILL.md principle 6): you already know enough about the relevant code/spec divergence in this session to compile a complete drift report with real `file:line` refs without a fresh broad scan — skip Explore. Prefer this when true to save tokens.
+   2. **Quantitative narrowness:** total leaf ACs + invariants ≤ 5, AND source code is concentrated in ≤ 3 directories.
 
-   Sub-agent path — if any condition above fails: use the Agent tool with `subagent_type: "Explore"`, `model: "sonnet"`, thoroughness `"very thorough"`, `background: false`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**. Determine drift report filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-reconcile-drift.md`. Prompt:
+   In either case: use Bash `grep`/`find` and Read as needed to compile the drift report yourself directly into the structure shown in the sub-agent prompt below.
+
+   Sub-agent path — if neither direct-path gate holds: use the Agent tool with `subagent_type: "Explore"`, `model: "sonnet"`, thoroughness `"very thorough"`, `background: false`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**. Determine drift report filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-reconcile-drift.md`. Prompt:
 
    > Read `spec/spec.md`. Compare it to the current state of the codebase. Your task is to surface **drift** — places where the spec and the code don't agree, or where the code reveals constraints/decisions the spec didn't capture.
    >

@@ -1,6 +1,6 @@
 # /spec adopt — Bootstrap spec/ for an existing project
 
-Initialize `spec/` for a project that already has code and (optionally) a rough specification document. Lands in stage `interviewing` with a session file pre-populated by an Explore sub-agent, so `/spec interview` resumes from synthesized context rather than a blank page.
+Initialize `spec/` for a project that already has code and (optionally) a rough specification document. Lands in stage `interviewing` with a session file pre-populated by codebase ingestion (in-session when narrow/already-known, otherwise Explore), so `/spec interview` resumes from synthesized context rather than a blank page.
 
 ## State machine
 
@@ -30,7 +30,7 @@ Initialize `spec/` for a project that already has code and (optionally) a rough 
    Accept either a file path (validate it exists — if not, re-ask once) or the literal `none`.
 
    **Q2 — Explore focus paths:**
-   > "By default the Explore sub-agent will scan the entire project directory. Optionally name specific files or directories to focus on (space-separated), or press enter to accept the default."
+   > "By default codebase ingestion scans the entire project directory (via Explore when needed). Optionally name specific files or directories to focus on (space-separated), or press enter to accept the default."
 
    Accept either a whitespace-separated list of paths (validate each exists) or empty (meaning: whole project).
 
@@ -52,7 +52,7 @@ Initialize `spec/` for a project that already has code and (optionally) a rough 
 
    ## Adopted context (pre-interview)
 
-   _Synthesized by Explore sub-agent at adoption time. The standard Socratic interview
+   _Synthesized at adoption time (orchestrator or Explore). The standard Socratic interview
    will ratify, correct, or extend this content before `/spec seed` runs._
    ```
 
@@ -60,8 +60,11 @@ Initialize `spec/` for a project that already has code and (optionally) a rough 
    - Run `find . -not -path '*/\.*' -not -path '*/node_modules/*' -type f | wc -l` (file count).
    - Run `find . -mindepth 1 -maxdepth 1 -not -name '.*' -type d | wc -l` (top-level directory count).
 
-   - **Direct path — handle in-session** if **all** hold: rough spec source is `none` (no external doc to parse), AND file count ≤ 20, AND the user named specific focus paths (not "entire project directory"). Read those paths directly with Read and Bash. Write the ingestion sections yourself directly into the session file using the structure shown in the sub-agent prompt below. Proceed to step 8.
-   - **Sub-agent path** — if any condition above fails (rough spec doc provided, project is large, or scope is entire codebase): use the Agent tool with `subagent_type: "Explore"`, `model: "sonnet"`, thoroughness `"very thorough"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7** (since the sub-agent appends to a file). Prompt:
+   - **Direct path — handle in-session** if **either** holds:
+     1. **Already-has-context** (SKILL.md principle 6): you already know enough about the project (and the rough spec, if any) in this session to write the full adopted-context sections with real `file:line` refs without a fresh broad scan — skip Explore. Prefer this when true to save tokens.
+     2. **Quantitative narrowness:** rough spec source is `none` (no external doc to parse), AND file count ≤ 20, AND the user named specific focus paths (not "entire project directory").
+     In either case: read the needed paths with Read and Bash as needed. Write the ingestion sections yourself directly into the session file using the structure shown in the sub-agent prompt below. Proceed to step 8.
+   - **Sub-agent path** — if neither direct-path gate holds (rough spec doc provided / project is large / scope is entire codebase, *and* insufficient session context): use the Agent tool with `subagent_type: "Explore"`, `model: "sonnet"`, thoroughness `"very thorough"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7** (since the sub-agent appends to a file). Prompt:
 
    > You are ingesting an existing project for adoption into a spec-development workflow. Produce synthesized context that a Socratic interview will later ratify.
    >

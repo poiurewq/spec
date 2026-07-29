@@ -106,12 +106,15 @@ Read `state.yaml` first; validate stage. Write `state.yaml` only when the user c
 
    **5e. Tell the user:** "Open a fresh conversation in this repo, paste the prompt above, implement phase `<N>`, then return here and re-run `/spec implement`. Committing between sessions is fine — the audit will scan recent git log entries (since the last `state.yaml` commit) plus any uncommitted changes to find the phase diff, and will ask you to confirm the commit range if it's ambiguous." Stop.
 
-6. **Audit.** Determine filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-implement-phase<N>.md`. Before spawning, triage scope using the leaf AC count for phase `<N>` (already extracted in step 5a).
+6. **Audit.** Determine filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-implement-phase<N>.md`. Before spawning, triage using the leaf AC count for phase `<N>` (already extracted in step 5a) **and** whether this session already has enough context (SKILL.md principle 6).
 
    The **phase diff scope** from step 4 (commits + any uncommitted files) tells the auditor *where to look first*. Pass it through as a hint — the auditor still reads code at HEAD (committed state takes precedence; uncommitted is layered on top via `git diff`).
 
-   - **Direct path — handle in-session** if the phase has ≤ 3 leaf ACs: use Bash `grep`/`find` and Read to gather evidence for each AC and run the invariant regression check. For changed files, read the current state at HEAD; for any uncommitted modifications, layer in `git diff` output. Write the audit report yourself to the filename above using the structure shown in the sub-agent prompt below. Proceed to step 7.
-   - **Sub-agent path** — if the phase has > 3 leaf ACs, or if the invariant scope is wide enough that a single-pass grep would be unreliable: spawn an `Explore` sub-agent with `model: "sonnet"`. Include the phase diff scope (commit SHAs + file list) in the prompt. The prompt must include the **write-fallback instruction from SKILL.md principle 7**:
+   - **Direct path — handle in-session** if **either** holds:
+     1. **Already-has-context** (SKILL.md principle 6): you already know enough about the phase's changed code and relevant paths in this session to write a complete per-AC audit with real `file:line` refs without a fresh broad scan — skip Explore. Prefer this when true to save tokens.
+     2. **Quantitative narrowness:** the phase has ≤ 3 leaf ACs.
+     In either case: use Bash `grep`/`find` and Read as needed to gather evidence for each AC and run the invariant regression check. For changed files, read the current state at HEAD; for any uncommitted modifications, layer in `git diff` output. Write the audit report yourself to the filename above using the structure shown in the sub-agent prompt below. Proceed to step 7.
+   - **Sub-agent path** — if neither direct-path gate holds (phase has > 3 leaf ACs *and* insufficient session context, or invariant scope is wide enough that a single-pass check would be unreliable without exploration): spawn an `Explore` sub-agent with `model: "sonnet"`. Include the phase diff scope (commit SHAs + file list) in the prompt. The prompt must include the **write-fallback instruction from SKILL.md principle 7**:
 
    > Read `spec/spec.md`. From the `## Implementation phases` section, identify phase `<N>` and the leaf AC IDs it covers. The orchestrator has identified the phase diff as: commits `<SHA-list-or-"none">`; uncommitted files `<file-list-or-"none">`. Use this as a starting point but do not limit yourself to it — search the whole codebase if AC evidence might live elsewhere. For **each AC in this phase only** (do not audit other phases or the full spec):
    >
