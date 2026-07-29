@@ -15,7 +15,7 @@ Force discipline at the input stage of software projects: surface assumptions, e
 - **Single entry point:** `/spec <subcommand>` — router in `SKILL.md`
 - **Artifacts under `./spec/`** in the user's project directory
 - **State tracked in `./spec/state.yaml`** — single source of truth for stage, iteration, mode
-- **Seed drafts in-conversation** in a fresh, steerable session; persona reviews run as Sonnet sub-agents
+- **Seed drafts in-conversation** in a fresh, steerable session; persona reviews run as sub-agents (prefer cheaper model if available)
 - **`Explore` subagent** for codebase reading on verify / implement audit / adopt / reconcile / interview — only after triage; skipped when scope is narrow **or** the orchestrator already has enough session context (see SKILL.md principle 6)
 - **Plain text + git** — no databases, no hidden state
 
@@ -73,7 +73,7 @@ Per-phase `/spec implement` audits that touch `[external]` ACs should honor the 
 | `/spec interview` | Socratic interview; clarity-gate before seed. Optional `--iteration N` on init |
 | `/spec adopt` | Bootstrap `spec/` for an existing brownfield project (with optional rough spec doc). Lands in `interviewing` with pre-populated context. Optional `--iteration N` |
 | `/spec seed` | Draft or revise `spec.md` from interview |
-| `/spec review` | Three parallel Sonnet personas critique the spec |
+| `/spec review` | Three parallel personas critique the spec (sub-agents; prefer cheaper model if available) |
 | `/spec revise` | Three-turn: summarize → user addresses → propose revision |
 | `/spec check` | Convergence test (two consecutive wording-only revisions, or explicit product-owner prerogative) |
 | `/spec implement` | Orchestrates per-phase implementation: kickoff prompt for a fresh session, then per-phase audit on re-run (direct or Explore after triage). Does **not** implement code itself |

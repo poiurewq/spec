@@ -1,6 +1,6 @@
 # /spec interview — Socratic interview
 
-Conduct a Socratic interview to turn a vague project idea (or iteration request) into the inputs needed for a precise specification. You (main Opus agent) are the interviewer — do not delegate.
+Conduct a Socratic interview to turn a vague project idea (or iteration request) into the inputs needed for a precise specification. You (the main agent) are the interviewer — do not delegate.
 
 ## State machine
 
@@ -61,7 +61,7 @@ If starting fresh (no state.yaml or coming from `closed`):
      If yes, triage before spawning (SKILL.md principle 6 — either gate skips Explore):
      - **Already-has-context:** if you already know enough about the named paths/code in this session to write a solid `## Current state [from-code]` section with real `file:line` refs, do it yourself — no sub-agent. Prefer this when true to save tokens.
      - **Quantitative narrowness:** if the user named ≤ 3 specific files or a single narrow directory, read those paths directly with Read and Bash, then append the section yourself.
-     - **Otherwise** (broad directory, "entire codebase", or many paths, *and* insufficient session context): spawn Agent with `subagent_type: "Explore"`, `model: "sonnet"`, prompt narrowly scoped to the user-specified paths with output appended to the session file. The sub-agent prompt must include the **write-fallback instruction from SKILL.md principle 7** — attempt to append to the session file; on Write denial, retry once, then dump full content in the reply. After the sub-agent returns, verify the append landed; if not, write it from the parent session.
+     - **Otherwise** (broad directory, "entire codebase", or many paths, *and* insufficient session context): spawn Agent with `subagent_type: "Explore"`, prefer cheaper model if available (SKILL.md principle 6), prompt narrowly scoped to the user-specified paths with output appended to the session file. The sub-agent prompt must include the **write-fallback instruction from SKILL.md principle 7** — attempt to append to the session file; on Write denial, retry once, then dump full content in the reply. After the sub-agent returns, verify the append landed; if not, write it from the parent session.
 
 3. **Deferred-items triage** (before intent questions; after context ingestion). If `spec/deferred.md` exists and contains at least one item:
 

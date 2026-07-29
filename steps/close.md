@@ -40,7 +40,7 @@ Once all GAPs/UNCLEARs are resolved or accepted:
    - `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-spec.md`
    - `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-takeaway.md`
 
-2. **Spawn takeaway generator.** Agent tool, `subagent_type: "general-purpose"`, `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**. Prompt:
+2. **Spawn takeaway generator.** Agent tool, `subagent_type: "general-purpose"`, prefer cheaper model if available (SKILL.md principle 6). The prompt must include the **write-fallback instruction from SKILL.md principle 7**. Prompt:
 
    > Generate `spec/takeaway.md` using the template at `<skill-base-dir>/templates/takeaway.md` (resolve `<skill-base-dir>` to the absolute path announced at skill invocation before passing to the sub-agent).
    >

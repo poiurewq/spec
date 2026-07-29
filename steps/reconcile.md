@@ -54,7 +54,7 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
 
    In either case: use Bash `grep`/`find` and Read as needed to compile the drift report yourself directly into the structure shown in the sub-agent prompt below.
 
-   Sub-agent path — if neither direct-path gate holds: use the Agent tool with `subagent_type: "Explore"`, `model: "sonnet"`, thoroughness `"very thorough"`, `background: false`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**. Determine drift report filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-reconcile-drift.md`. Prompt:
+   Sub-agent path — if neither direct-path gate holds: use the Agent tool with `subagent_type: "Explore"`, prefer cheaper model if available (SKILL.md principle 6), thoroughness `"very thorough"`, `background: false`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**. Determine drift report filename: `spec/archive/v<NNN>-<YYYY-MM-DD-HHMM>-reconcile-drift.md`. Prompt:
 
    > Read `spec/spec.md`. Compare it to the current state of the codebase. Your task is to surface **drift** — places where the spec and the code don't agree, or where the code reveals constraints/decisions the spec didn't capture.
    >
@@ -114,7 +114,7 @@ Three ways to invoke. They differ only in **how drift items are sourced**; the p
    >
    > Reply `reject` for any item that isn't real drift.
 
-   The five buckets (for Claude's suggestion heuristics):
+   The five buckets (for the orchestrator's suggestion heuristics):
 
    1. **Decision-only** — propose an entry for `decisions.md` via `/spec decide`'s auto-invocation protocol (mandatory Consent gate; user may decline); `spec.md` untouched. Stage unchanged.
       *Suggest when:* the drift is a non-load-bearing implementation choice (library/algorithm pick, naming, internal refactor) that no AC or invariant constrains.

@@ -1,6 +1,6 @@
 # /spec review — Three-persona review
 
-Three skeptical review passes against the current `spec/spec.md`. Each persona runs as a parallel Sonnet sub-agent.
+Three skeptical review passes against the current `spec/spec.md`. Each persona runs as a parallel sub-agent (prefer cheaper model if available — SKILL.md principle 6).
 
 ## State machine
 
@@ -18,7 +18,7 @@ Read state.yaml first; validate stage. Write state.yaml on completion.
 
 3. **Spawn three sub-agents in parallel.** Single message with three Agent tool calls. For each:
    - `subagent_type: "general-purpose"`
-   - `model: "sonnet"`
+   - prefer cheaper model if available (SKILL.md principle 6); omit `model` if the host has no cheaper tier
    - Prompt (must embed the **write-fallback instruction from SKILL.md principle 7**):
 
      > Adopt the role at `<skill-base-dir>/personas/<PERSONA>.md` (resolve `<skill-base-dir>` to the absolute path announced at skill invocation before passing to the sub-agent). Read `spec/spec.md`.
