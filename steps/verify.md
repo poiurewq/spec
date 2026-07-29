@@ -20,8 +20,29 @@ Read state.yaml first; validate stage. Write state.yaml on completion.
 
 4. **Triage and gather evidence.** Before deciding to spawn, count the total leaf ACs and invariant entries in `spec/spec.md` (read it now if not already done). Also estimate source breadth: `find . -mindepth 1 -maxdepth 2 -not -path '*/\.*' -not -path '*/node_modules/*' -type d | wc -l`.
 
-   - **Direct path — handle in-session** if **all** hold: total leaf ACs + invariants ≤ 5, AND source code is concentrated in ≤ 3 directories. Use Bash `grep`/`find` and Read to locate evidence for each AC and invariant. Write the report yourself to `spec/archive/<FILENAME>` using the exact structure shown in the sub-agent prompt below. Proceed to step 5.
-   - **Sub-agent path** — if any condition above fails (wide scope, many ACs, or breadth makes targeted passes unreliable): use the Agent tool with `subagent_type: "Explore"` and `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7**. Prompt:
+   **Search-scope allowlist (sibling repos + extra in-repo paths).** Before gathering evidence — whether direct or via sub-agent — load optional `spec/verify-allowlist.yaml` from the project root if it exists. Schema:
+
+   ```yaml
+   sibling_repos:            # paths relative to project root (often ../other-repo)
+     - ../docs-site
+   extra_paths:              # optional in-repo (or relative) trees always in scope
+     - path/to/retained-but-excluded
+   ```
+
+   There is **no skill-level directory-name convention** (no hard-coded `Dormant/`, `_archive/`, etc.). Projects list whatever trees agents might otherwise skip — build-excluded sources, retained assets, vendor mirrors — under `extra_paths`. Sibling deliverables go under `sibling_repos`.
+
+   Apply these rules to every evidence pass (orchestrator direct path **and** Explore sub-agent prompt):
+
+   1. **Sibling repos.** For each entry under `sibling_repos`, resolve the path relative to the project root and treat that directory tree as readable evidence scope. Prefer `Read` / `grep` / `find` on the resolved absolute path. If an AC names a concrete path under `../…` (even when no allowlist file exists), resolve and Read it relative to the project root — never mark **UNCLEAR** solely because the file is outside the git root.
+   2. **Paths embedded in ACs.** Any filesystem path that appears in an AC must be opened directly relative to the project root; do not rely on a root-only recursive grep that may skip it (gitignore, unusual layout, or agent default scope).
+   3. **Extra in-repo paths.** For each entry under `extra_paths`, resolve relative to the project root and include that tree in search/read scope. Use this for project-specific locations that remain in git but are easy to miss (e.g. excluded from the build target). Naming is entirely project-owned.
+   4. **Missing allowlist file.** If `spec/verify-allowlist.yaml` is absent, still apply (2). Sibling roots and extra trees are only auto-expanded when listed in the allowlist or explicitly path-referenced by an AC.
+   5. **Verdict discipline.** Use **UNCLEAR** only when the path was searched (project tree + allowlisted siblings + allowlisted extra paths + named AC paths) and evidence is still insufficient. Do **not** use UNCLEAR as a stand-in for "outside my default cwd" or "looked excluded from the build."
+
+   Document this mechanism for skill consumers in `README.md` (§ Search-scope allowlist).
+
+   - **Direct path — handle in-session** if **all** hold: total leaf ACs + invariants ≤ 5, AND source code is concentrated in ≤ 3 directories. Use Bash `grep`/`find` and Read to locate evidence for each AC and invariant, honoring the allowlist rules above. Write the report yourself to `spec/archive/<FILENAME>` using the exact structure shown in the sub-agent prompt below. Proceed to step 5.
+   - **Sub-agent path** — if any condition above fails (wide scope, many ACs, or breadth makes targeted passes unreliable): use the Agent tool with `subagent_type: "Explore"` and `model: "sonnet"`. The prompt must include the **write-fallback instruction from SKILL.md principle 7** **and** the search-scope allowlist block below (expand with the project's actual allowlist contents if the file exists). Prompt:
 
    > Read `spec/spec.md`. For **each acceptance criterion** in the AC tree (at every level — AC1, AC1.1, AC1.2, etc.):
    >
@@ -29,6 +50,13 @@ Read state.yaml first; validate stage. Write state.yaml on completion.
    > - Render one verdict: **PASS**, **GAP**, or **UNCLEAR**.
    > - Include specific `file:line` references for every claim.
    > - Include a one-line reason.
+   >
+   > **Search scope (mandatory):**
+   > - If `spec/verify-allowlist.yaml` exists, read it.
+   >   - For every `sibling_repos` entry, resolve relative to the project root and search/read inside it when ACs need external evidence.
+   >   - For every `extra_paths` entry, resolve relative to the project root and include that tree in scope (project-specific retained/excluded/archive trees — no fixed directory names).
+   > - For any path that appears in an AC text (including `../…` sibling paths), resolve relative to the project root and **Read the file directly**. Do not stop at the project git root.
+   > - Never render **UNCLEAR** only because a file lives under an allowlisted sibling, an allowlisted extra path, or a path named in an AC; search there first. UNCLEAR only after those locations were checked.
    >
    > If the spec has an Invariants section (iteration mode), give each invariant its own entry with the same PASS/GAP/UNCLEAR verdict.
    >

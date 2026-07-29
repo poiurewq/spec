@@ -28,6 +28,7 @@ spec/
 ├── decisions.md                        # cross-iteration, append-only (past-tense)
 ├── deferred.md                          # cross-iteration backlog (future-tense, mutable)
 ├── state.yaml                           # stage machine state (skill-writes only)
+├── verify-allowlist.yaml                # optional — sibling-repo + extra-path search scope for /spec verify
 └── archive/                             # flat, v-prefixed; working + snapshots
     ├── v<NNN>-YYYY-MM-DD-HHMM-interview.md
     ├── v<NNN>-YYYY-MM-DD-HHMM-<persona>.md
@@ -35,6 +36,33 @@ spec/
     ├── v<NNN>-YYYY-MM-DD-HHMM-spec.md   # snapshot at close
     └── v<NNN>-YYYY-MM-DD-HHMM-takeaway.md  # snapshot at close
 ```
+
+## Search-scope allowlist (`/spec verify`)
+
+Some acceptance criteria reference deliverables **outside** the project git root (sibling repos under the same parent directory) or under **in-repo trees agents often skip** (build-excluded sources, retained assets, local archives). Without an explicit scope, Explore sub-agents mark those ACs **UNCLEAR** as search-scope artifacts.
+
+The skill does **not** hard-code project layout conventions (no fixed `Dormant/`, `_archive/`, etc.). Each project lists its own extra trees.
+
+**Mechanism** (implemented in `steps/verify.md`):
+
+1. Optional project file `spec/verify-allowlist.yaml`:
+
+   ```yaml
+   sibling_repos:                 # outside this git root; relative to project root
+     - ../docs-site
+   extra_paths:                   # optional; in-repo trees always in search scope
+     - path/to/retained-sources   # project-owned names — not a skill convention
+   ```
+
+2. The verify orchestrator and Explore prompt must:
+   - Resolve each `sibling_repos` entry and search/read inside it.
+   - Resolve each `extra_paths` entry and include that tree in scope.
+   - Directly `Read` any path that appears in AC text (including `../…`).
+   - Never emit **UNCLEAR** solely because a file lives outside the git root or under an allowlisted extra path after those locations were checked.
+
+3. If the allowlist file is missing, path-in-AC resolution still applies; sibling roots and extra trees are only auto-expanded when listed or path-referenced by an AC.
+
+Per-phase `/spec implement` audits that touch `[external]` ACs should honor the same rules when the phase scope includes them.
 
 ## Subcommands
 

@@ -120,6 +120,8 @@ Read `state.yaml` first; validate stage. Write `state.yaml` only when the user c
    > - Include specific `file:line` references for every claim.
    > - Include a one-line reason.
    >
+   > **Search scope:** Honor `spec/verify-allowlist.yaml` when present (`sibling_repos`, `extra_paths`). Directly Read any path named in a phase AC (including `../…`). Do not mark UNCLEAR only because a file is outside the git root or under an allowlisted extra path — see skill README § Search-scope allowlist. No skill-level directory-name convention for extra trees.
+   >
    > Additionally, for any `## Invariants` or `## Provisional invariants` listed in `spec.md`, run a quick regression check (PASS / GAP / UNCLEAR) — if the phase's implementation could plausibly have touched the same code paths. Skip invariants that are clearly orthogonal; say "skipped — orthogonal to phase scope" for those.
    >
    > **Do not render an overall verdict.** Per-AC evidence only. The user judges.
