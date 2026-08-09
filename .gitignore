@@ -1,2 +1,10 @@
+# Private / local — never ship (belt-and-suspenders; qskill mirror also prunes these)
 dev/
+notes/
+private/
+papertrail/
+.claude/
+**/*.local.md
+**/*.local.*
+.DS_Store
 **/*.swp
