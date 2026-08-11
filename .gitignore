@@ -4,6 +4,12 @@ notes/
 private/
 papertrail/
 .claude/
+.grok/
+.dev/
+.tasks/
+TASKS.md
+AGENTS.md
+CLAUDE.md
 **/*.local.md
 **/*.local.*
 .DS_Store
